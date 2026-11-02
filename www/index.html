@@ -1,1 +1,1869 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>OjolKu — Pembukuan + Tracking</title>
 
+<!-- ============================================================
+     DETEKSI LINGKUNGAN NATIVE (Capacitor)
+     Jika dibuka sebagai APK, window.IS_NATIVE = true
+     Jika dibuka di browser, window.IS_NATIVE = false
+     ============================================================ -->
+<script>
+  (function() {
+    window.IS_NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+    if (window.IS_NATIVE) {
+      console.log('[OjolKu] Berjalan di lingkungan NATIVE (APK Android)');
+    } else {
+      console.log('[OjolKu] Berjalan di BROWSER');
+    }
+  })();
+</script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --primary:#0f766e;--primary-dark:#115e59;--primary-light:#ccfbf1;
+  --bg:#f8fafc;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+  --red:#dc2626;--red-light:#fee2e2;--green:#16a34a;--green-light:#dcfce7;
+  --blue:#2563eb;--orange:#ea580c;
+  --shadow:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.03);
+  --shadow-lg:0 10px 30px rgba(0,0,0,.08);
+}
+html,body{margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased}
+#app{max-width:600px;margin:0 auto;min-height:100vh;padding-bottom:90px}
+
+.app-header{background:#fff;padding:16px 20px 12px;border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:50;backdrop-filter:blur(10px)}
+.header-row{display:flex;justify-content:space-between;align-items:center}
+.app-title{font-size:18px;font-weight:800;letter-spacing:-.3px}
+.app-title span{color:var(--primary)}
+.header-sub{font-size:12px;color:var(--muted);margin-top:1px}
+
+main{padding:16px}
+.screen{display:none;animation:fadeIn .2s ease}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.date-nav{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.date-btn{background:#fff;border:1px solid var(--border);width:40px;height:40px;
+  border-radius:12px;font-size:16px;cursor:pointer;color:var(--text);font-family:inherit;
+  display:flex;align-items:center;justify-content:center;transition:all .15s}
+.date-btn:active{transform:scale(.94);background:var(--bg)}
+.date-btn:disabled{opacity:.3;cursor:not-allowed}
+.date-display{flex:1;background:#fff;border:1px solid var(--border);border-radius:12px;
+  padding:8px 14px;text-align:center;cursor:pointer;transition:all .15s}
+.date-display:active{background:var(--bg)}
+.date-main{font-size:15px;font-weight:700}
+.date-sub{font-size:11px;color:var(--muted);margin-top:1px}
+
+.big-card{border-radius:20px;padding:20px;color:#fff;margin-bottom:12px;
+  position:relative;overflow:hidden;box-shadow:var(--shadow-lg)}
+.big-card::after{content:'';position:absolute;width:200px;height:200px;
+  background:rgba(255,255,255,.08);border-radius:50%;top:-80px;right:-60px}
+.big-card.income{background:linear-gradient(135deg,#0f766e,#115e59)}
+.big-card-label{font-size:12px;opacity:.85;font-weight:500;position:relative;z-index:1}
+.big-card-value{font-size:28px;font-weight:800;letter-spacing:-.5px;margin-top:2px;
+  position:relative;z-index:1;font-variant-numeric:tabular-nums}
+.big-card-meta{font-size:12px;opacity:.9;margin-top:6px;position:relative;z-index:1;
+  display:flex;justify-content:space-between}
+
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.sm-card{background:#fff;border-radius:14px;padding:14px;border:1px solid var(--border)}
+.sm-label{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px;
+  text-transform:uppercase;letter-spacing:.3px}
+.sm-value{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.sm-value.green{color:var(--green)}
+.sm-value.red{color:var(--red)}
+.sm-value.blue{color:var(--blue)}
+
+.target-card{background:#fff;border-radius:16px;padding:16px;border:1px solid var(--border);
+  margin-bottom:12px}
+.target-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.target-title{font-size:13px;font-weight:700}
+.target-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.target-pct{font-size:18px;font-weight:800;color:var(--primary);font-variant-numeric:tabular-nums}
+.progress-track{height:10px;background:var(--bg);border-radius:5px;overflow:hidden}
+.progress-fill{height:100%;border-radius:5px;transition:width .5s ease;
+  background:linear-gradient(90deg,#14b8a6,#0f766e)}
+.progress-fill.warn{background:linear-gradient(90deg,#f59e0b,#ea580c)}
+.progress-fill.done{background:linear-gradient(90deg,#16a34a,#15803d)}
+.progress-fill.danger{background:linear-gradient(90deg,#ef4444,#dc2626)}
+.target-info{font-size:11px;color:var(--muted);margin-top:6px;display:flex;justify-content:space-between}
+
+.shift-card{background:#fff;border-radius:16px;padding:16px;border:1px solid var(--border);margin-bottom:12px}
+.shift-times{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.time-input{padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;
+  font-family:inherit;font-size:14px;background:#fff;color:var(--text);outline:none;width:100%}
+.time-input:focus{border-color:var(--primary)}
+.shift-result{display:flex;justify-content:space-between;margin-top:12px;padding-top:12px;
+  border-top:1px dashed var(--border);font-size:13px}
+.shift-result strong{color:var(--primary);font-size:15px}
+
+.section-title{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.5px;margin:20px 0 10px}
+.section-title:first-child{margin-top:0}
+
+.entry-list{background:#fff;border-radius:16px;border:1px solid var(--border);overflow:hidden}
+.entry-item{display:flex;align-items:center;gap:12px;padding:12px 14px;
+  border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.entry-item:last-child{border-bottom:none}
+.entry-item:active{background:var(--bg)}
+.entry-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;
+  justify-content:center;font-size:20px;flex-shrink:0;background:var(--green-light)}
+.entry-icon.exp{background:var(--red-light)}
+.entry-body{flex:1;min-width:0}
+.entry-title{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.entry-sub{font-size:11px;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.entry-amount{font-size:14px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.entry-amount.inc{color:var(--green)}
+.entry-amount.exp{color:var(--red)}
+
+.empty{text-align:center;padding:36px 16px;color:var(--muted);font-size:13px}
+.empty-icon{font-size:44px;margin-bottom:8px;opacity:.3}
+
+.notes-box{background:#fff;border-radius:16px;padding:16px;border:1px solid var(--border);margin-bottom:12px}
+.notes-box textarea{width:100%;padding:10px;border:1.5px solid var(--border);border-radius:10px;
+  font-family:inherit;font-size:14px;resize:vertical;min-height:70px;outline:none;background:var(--bg)}
+.notes-box textarea:focus{border-color:var(--primary);background:#fff}
+
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border:none;border-radius:12px;font-family:inherit;font-size:14px;font-weight:700;
+  cursor:pointer;padding:14px 16px;transition:all .15s}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-income{background:var(--green);color:#fff;box-shadow:0 2px 8px rgba(22,163,74,.25)}
+.btn-expense{background:var(--red-light);color:var(--red)}
+.btn-primary{background:var(--primary);color:#fff;width:100%}
+.btn-ghost{background:#fff;color:var(--muted);border:1.5px solid var(--border)}
+.btn-danger{background:var(--red-light);color:var(--red)}
+.btn-sm{padding:10px 14px;font-size:13px}
+
+.history-day{background:#fff;border-radius:14px;border:1px solid var(--border);margin-bottom:8px;overflow:hidden}
+.history-header{display:flex;justify-content:space-between;align-items:center;
+  padding:14px 16px;cursor:pointer;transition:background .15s}
+.history-header:active{background:var(--bg)}
+.history-date{font-size:14px;font-weight:700}
+.history-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.history-net{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;text-align:right}
+.history-net.pos{color:var(--green)}
+.history-net.neg{color:var(--red)}
+.history-details{display:none;border-top:1px solid var(--border);padding:0}
+.history-details.open{display:block}
+
+.chart{display:flex;align-items:flex-end;gap:4px;height:140px;padding:8px 0 24px;position:relative}
+.bar-wrapper{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;position:relative}
+.bar{width:100%;border-radius:6px 6px 2px 2px;min-height:3px;transition:height .3s;
+  background:linear-gradient(180deg,#14b8a6,#0f766e)}
+.bar.neg{background:linear-gradient(180deg,#f87171,#dc2626)}
+.bar-label{position:absolute;bottom:-22px;font-size:9px;color:var(--muted);white-space:nowrap}
+
+.cat-item{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:13px}
+.cat-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  background:var(--red-light);font-size:14px;flex-shrink:0}
+.cat-name{flex:1;font-weight:600}
+.cat-amount{font-size:12px;font-weight:700;color:var(--red);font-variant-numeric:tabular-nums}
+.cat-bar-track{height:6px;background:var(--bg);border-radius:3px;margin-top:4px;overflow:hidden}
+.cat-bar-fill{height:100%;background:var(--red);border-radius:3px;transition:width .3s}
+
+.period-tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px}
+.period-tab{background:#fff;border:1px solid var(--border);padding:8px 14px;border-radius:20px;
+  font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s}
+.period-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+.track-header-card{background:#fff;border-radius:16px;padding:16px;border:1px solid var(--border);
+  margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.track-status-info{flex:1;min-width:0}
+.track-status-label{font-size:14px;font-weight:700}
+.track-status-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.track-dot{width:8px;height:8px;border-radius:50%;background:#94a3b8;
+  display:inline-block;margin-right:6px;vertical-align:middle}
+.track-dot.active{background:var(--green);animation:pulse 1.5s infinite;box-shadow:0 0 0 3px rgba(22,163,74,.2)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.btn-track{background:var(--primary);color:#fff;font-weight:700;padding:12px 18px;border-radius:12px;
+  border:none;cursor:pointer;font-family:inherit;font-size:13px;white-space:nowrap}
+.btn-track.stop{background:var(--red)}
+.btn-track.resume{background:var(--orange)}
+.btn-track:active{transform:scale(.95)}
+
+#map{height:340px;border-radius:14px;overflow:hidden;border:1px solid var(--border);margin-bottom:12px}
+#map.empty-map{display:flex;align-items:center;justify-content:center;background:var(--bg);
+  color:var(--muted);font-size:13px;text-align:center;padding:20px}
+
+.track-session{background:#fff;border-radius:14px;border:1px solid var(--border);
+  padding:12px 14px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:12px;
+  transition:all .15s}
+.track-session:active{transform:scale(.99)}
+.track-session.selected{border-color:var(--primary);background:var(--primary-light)}
+.track-session.active-track{border-color:var(--green);background:#f0fdf4}
+.track-session-icon{width:44px;height:44px;border-radius:12px;background:var(--primary-light);
+  color:var(--primary-dark);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.track-session.active-track .track-session-icon{background:var(--green);color:#fff}
+.track-session-body{flex:1;min-width:0}
+.track-session-title{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.track-session-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.track-session-arrow{color:var(--muted);font-size:16px}
+
+.warn-box{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;
+  padding:10px 12px;border-radius:10px;font-size:12px;line-height:1.5;margin-bottom:12px}
+.warn-box.native{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
+
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:600px;margin:0 auto;background:#fff;
+  display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--border);
+  padding:6px 2px calc(6px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(0,0,0,.05);z-index:100}
+.nav-btn{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:8px 2px;color:var(--muted);cursor:pointer;border-radius:10px;font-family:inherit;
+  font-size:9px;font-weight:600;transition:color .15s}
+.nav-btn .nav-icon{font-size:18px;line-height:1;filter:grayscale(1);opacity:.6;transition:all .15s}
+.nav-btn.active{color:var(--primary)}
+.nav-btn.active .nav-icon{filter:none;opacity:1}
+
+.fab{position:fixed;bottom:88px;right:20px;width:56px;height:56px;
+  border-radius:50%;background:var(--primary);color:#fff;border:none;font-size:28px;
+  cursor:pointer;box-shadow:0 6px 20px rgba(15,118,110,.4);z-index:99;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:inherit}
+.fab:active{transform:scale(.92)}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;
+  display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:24px 24px 0 0;padding:20px;width:100%;max-width:600px;
+  max-height:92vh;overflow-y:auto;animation:slideUp .25s ease;
+  padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.modal-title{font-size:17px;font-weight:800}
+.modal-close{background:var(--bg);border:none;width:32px;height:32px;border-radius:50%;
+  font-size:16px;cursor:pointer;color:var(--muted);font-family:inherit}
+
+.type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.type-toggle button{background:var(--bg);border:2px solid transparent;padding:14px;border-radius:14px;
+  font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;color:var(--muted);transition:all .15s}
+.type-toggle button.active[data-type="income"]{background:var(--green-light);color:var(--green);border-color:var(--green)}
+.type-toggle button.active[data-type="expense"]{background:var(--red-light);color:var(--red);border-color:var(--red)}
+
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.3px}
+.amount-input{width:100%;padding:16px;border:2px solid var(--border);border-radius:14px;
+  font-size:26px;font-family:inherit;font-weight:800;background:#fff;color:var(--text);
+  outline:none;transition:border-color .15s;text-align:center;font-variant-numeric:tabular-nums}
+.amount-input:focus{border-color:var(--primary)}
+.form-input,.form-select{width:100%;padding:12px 14px;border:1.5px solid var(--border);
+  border-radius:12px;font-size:15px;font-family:inherit;background:#fff;color:var(--text);outline:none}
+.form-input:focus,.form-select:focus{border-color:var(--primary)}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.auto-hint{font-size:10px;color:var(--green);font-weight:600;margin-top:3px;display:flex;align-items:center;gap:3px}
+
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.cat-btn{background:var(--bg);border:2px solid transparent;border-radius:12px;padding:10px 4px;
+  font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;
+  transition:all .15s;font-size:10px;font-weight:600;color:var(--muted)}
+.cat-btn.active{background:var(--primary-light);border-color:var(--primary);color:var(--primary-dark)}
+.cat-btn .cat-emoji{font-size:22px}
+.cat-btn.exp.active{background:var(--red-light);border-color:var(--red);color:var(--red)}
+
+.quick-amounts{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.quick-amount{background:var(--bg);border:none;padding:8px 12px;border-radius:10px;
+  font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s}
+.quick-amount:active{background:var(--primary-light);color:var(--primary-dark)}
+
+.modal-footer{display:flex;gap:8px;margin-top:8px}
+.modal-footer .btn{flex:1;padding:16px}
+
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:#0f172a;color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;
+  box-shadow:0 8px 30px rgba(0,0,0,.25);z-index:1000;opacity:0;transition:all .3s;
+  pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--green)}
+.toast.error{background:var(--red)}
+
+.hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}
+.settings-item{display:flex;justify-content:space-between;align-items:center;padding:14px 0;
+  border-bottom:1px solid var(--border);font-size:14px}
+.settings-item:last-child{border-bottom:none}
+.settings-item .label{font-weight:600}
+.settings-input{padding:8px 12px;border:1.5px solid var(--border);border-radius:10px;
+  font-family:inherit;font-size:14px;background:#fff;text-align:right;width:140px;outline:none}
+.settings-input:focus{border-color:var(--primary)}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header class="app-header">
+    <div class="header-row">
+      <div>
+        <div class="app-title">Ojol<span>Ku</span></div>
+        <div class="header-sub" id="headerSub">Pembukuan driver</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px">Bulan ini</div>
+        <div style="font-size:15px;font-weight:800;color:var(--primary)" id="headerMonthNet">Rp 0</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- BERANDA -->
+    <section id="screen-home" class="screen active">
+      <div class="date-nav">
+        <button class="date-btn" onclick="changeDate(-1)">‹</button>
+        <div class="date-display" onclick="openDatePicker()">
+          <div class="date-main" id="dateMain">Hari Ini</div>
+          <div class="date-sub" id="dateSub">-</div>
+        </div>
+        <button class="date-btn" id="btnNextDay" onclick="changeDate(1)">›</button>
+      </div>
+
+      <div class="big-card income">
+        <div class="big-card-label">💰 Pendapatan</div>
+        <div class="big-card-value" id="dayIncome">Rp 0</div>
+        <div class="big-card-meta">
+          <span id="dayIncomeMeta">0 entri</span>
+          <span id="dayIncomeCompare"></span>
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div class="sm-card">
+          <div class="sm-label">💸 Pengeluaran</div>
+          <div class="sm-value red" id="dayExpense">Rp 0</div>
+        </div>
+        <div class="sm-card">
+          <div class="sm-label">✨ Bersih</div>
+          <div class="sm-value blue" id="dayNet">Rp 0</div>
+        </div>
+      </div>
+
+      <div class="target-card">
+        <div class="target-header">
+          <div>
+            <div class="target-title">🎯 Target Harian</div>
+            <div class="target-sub" id="targetSub">Rp 200.000</div>
+          </div>
+          <div class="target-pct" id="targetPct">0%</div>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="targetBar" style="width:0%"></div>
+        </div>
+        <div class="target-info">
+          <span id="targetNow">Rp 0 tercapai</span>
+          <span id="targetLeft">Kurang Rp 200.000</span>
+        </div>
+      </div>
+
+      <div class="shift-card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:13px;font-weight:700">⏱️ Jam Kerja</span>
+          <span style="font-size:11px;color:var(--muted)" id="shiftStatus">Belum diisi</span>
+        </div>
+        <div class="shift-times">
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Mulai</div>
+            <input type="time" class="time-input" id="shiftStart" onchange="saveShift()">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Selesai</div>
+            <input type="time" class="time-input" id="shiftEnd" onchange="saveShift()">
+          </div>
+        </div>
+        <div class="shift-result" id="shiftResult" style="display:none">
+          <div>
+            <div style="font-size:11px;color:var(--muted)">Durasi</div>
+            <strong id="shiftDuration">0 jam</strong>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11px;color:var(--muted)">Rp / jam</div>
+            <strong id="shiftRate">Rp 0</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <button class="btn btn-income" onclick="openEntryModal('income')">➕ Pendapatan</button>
+        <button class="btn btn-expense" onclick="openEntryModal('expense')">➖ Pengeluaran</button>
+      </div>
+
+      <div class="section-title">📋 Rincian Hari Ini</div>
+      <div id="entriesList"></div>
+
+      <div class="section-title">📝 Catatan</div>
+      <div class="notes-box">
+        <textarea id="dailyNotes" placeholder="Contoh: orderan ramai, ban bocor, dapat bonus..." oninput="saveNotes()"></textarea>
+      </div>
+    </section>
+
+    <!-- TRACKING / PETA -->
+    <section id="screen-track" class="screen">
+      <div class="warn-box" id="trackWarnBox">
+        <strong>⚠️ GPS hanya jalan saat app terbuka</strong><br>
+        Taruh HP di holder + charger selama ngojek. Kalau pindah app sebentar, tracking pause otomatis — balik ke sini untuk lanjut.
+      </div>
+
+      <div class="track-header-card">
+        <div class="track-status-info">
+          <div class="track-status-label" id="trackLabel"><span class="track-dot"></span>Tidak aktif</div>
+          <div class="track-status-sub" id="trackSub">Tap Mulai untuk tracking perjalanan</div>
+        </div>
+        <button class="btn-track" id="btnTrackToggle" onclick="toggleTracking()">Mulai</button>
+      </div>
+
+      <div id="map" class="empty-map">Peta akan muncul saat tracking dimulai</div>
+
+      <div class="row-2">
+        <div class="sm-card">
+          <div class="sm-label">📍 Jarak</div>
+          <div class="sm-value blue" id="trackDistance">0 km</div>
+        </div>
+        <div class="sm-card">
+          <div class="sm-label">⏱️ Durasi</div>
+          <div class="sm-value" id="trackDuration">-</div>
+        </div>
+      </div>
+
+      <div class="section-title">📋 Sesi Tracking</div>
+      <div id="trackList"></div>
+    </section>
+
+    <!-- RIWAYAT -->
+    <section id="screen-history" class="screen">
+      <div class="section-title">📅 Riwayat Harian</div>
+      <div id="historyList"></div>
+    </section>
+
+    <!-- STATISTIK -->
+    <section id="screen-stats" class="screen">
+      <div class="period-tabs">
+        <button class="period-tab" data-period="week">7 Hari</button>
+        <button class="period-tab active" data-period="month">Bulan Ini</button>
+        <button class="period-tab" data-period="lastmonth">Bulan Lalu</button>
+        <button class="period-tab" data-period="all">Semua</button>
+      </div>
+
+      <div class="row-2">
+        <div class="sm-card">
+          <div class="sm-label">Total Pendapatan</div>
+          <div class="sm-value green" id="statIncome">Rp 0</div>
+        </div>
+        <div class="sm-card">
+          <div class="sm-label">Total Pengeluaran</div>
+          <div class="sm-value red" id="statExpense">Rp 0</div>
+        </div>
+      </div>
+
+      <div class="big-card income">
+        <div class="big-card-label">💎 Total Bersih</div>
+        <div class="big-card-value" id="statNet">Rp 0</div>
+        <div class="big-card-meta">
+          <span id="statDays">0 hari</span>
+          <span id="statAvg">Rata² Rp 0/hari</span>
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div class="sm-card">
+          <div class="sm-label">🎯 Target Bulanan</div>
+          <div class="sm-value blue" id="monthTargetProgress">-</div>
+        </div>
+        <div class="sm-card">
+          <div class="sm-label">📅 Sisa Hari</div>
+          <div class="sm-value" id="monthDaysLeft">-</div>
+        </div>
+      </div>
+
+      <div class="section-title">📈 Grafik Harian</div>
+      <div class="target-card">
+        <div class="chart" id="statChart"></div>
+      </div>
+
+      <div class="section-title">🏆 Rekor</div>
+      <div class="row-2">
+        <div class="sm-card">
+          <div class="sm-label">🔥 Terbaik</div>
+          <div class="sm-value green" id="bestDay">-</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px" id="bestDayDate"></div>
+        </div>
+        <div class="sm-card">
+          <div class="sm-label">📉 Terendah</div>
+          <div class="sm-value" id="worstDay">-</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px" id="worstDayDate"></div>
+        </div>
+      </div>
+
+      <div class="section-title">💸 Breakdown Pengeluaran</div>
+      <div class="target-card" id="catBreakdown"></div>
+    </section>
+
+    <!-- SETELAN -->
+    <section id="screen-settings" class="screen">
+      <div class="section-title">🎯 Target</div>
+      <div class="target-card">
+        <div class="settings-item">
+          <span class="label">Target Harian</span>
+          <input type="number" class="settings-input" id="settingDailyTarget" placeholder="200000" onchange="saveSettings()">
+        </div>
+        <div class="settings-item">
+          <span class="label">Target Bulanan</span>
+          <input type="number" class="settings-input" id="settingMonthlyTarget" placeholder="5000000" onchange="saveSettings()">
+        </div>
+      </div>
+
+      <div class="section-title">📤 Data & Backup</div>
+      <div class="target-card">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <button class="btn btn-ghost btn-sm" onclick="exportJSON()">💾 Backup JSON</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportCSV()">📊 Export CSV</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:8px" onclick="exportTracksGeoJSON()">🗺️ Export Tracking (GeoJSON)</button>
+        <button class="btn btn-danger btn-sm" style="width:100%" onclick="confirmReset()">🗑️ Reset Semua Data</button>
+        <div class="hint">💡 Backup rutin! Data tersimpan di HP ini saja.</div>
+      </div>
+
+      <div class="section-title">ℹ️ Tentang</div>
+      <div class="target-card" style="font-size:13px;color:var(--muted);line-height:1.6">
+        <p style="margin:0 0 8px"><strong style="color:var(--text)">OjolKu v4</strong> — Pembukuan + GPS tracking driver ojol.</p>
+        <p style="margin:0 0 8px" id="aboutPlatform">Memuat info platform...</p>
+        <p style="margin:0">Data tersimpan <strong>offline di HP kamu</strong>. Tidak ada server, tidak ada tracking oleh pihak lain.</p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="home" onclick="switchTab('home')">
+      <span class="nav-icon">🏠</span><span>Beranda</span>
+    </button>
+    <button class="nav-btn" data-tab="history" onclick="switchTab('history')">
+      <span class="nav-icon">📅</span><span>Riwayat</span>
+    </button>
+    <button class="nav-btn" data-tab="track" onclick="switchTab('track')">
+      <span class="nav-icon">🗺️</span><span>Peta</span>
+    </button>
+    <button class="nav-btn" data-tab="stats" onclick="switchTab('stats')">
+      <span class="nav-icon">📊</span><span>Statistik</span>
+    </button>
+    <button class="nav-btn" data-tab="settings" onclick="switchTab('settings')">
+      <span class="nav-icon">⚙️</span><span>Setelan</span>
+    </button>
+  </nav>
+
+  <button class="fab" onclick="openEntryModal('income')" aria-label="Tambah entri">+</button>
+</div>
+
+<!-- ENTRY MODAL -->
+<div id="entryModal" class="modal-overlay" onclick="if(event.target===this)closeEntryModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Tambah Pendapatan</div>
+      <button class="modal-close" onclick="closeEntryModal()">✕</button>
+    </div>
+
+    <div class="type-toggle" id="typeToggle">
+      <button data-type="income" class="active" onclick="setEntryType('income')">💰 Pendapatan</button>
+      <button data-type="expense" onclick="setEntryType('expense')">💸 Pengeluaran</button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Nominal</label>
+      <input type="number" class="amount-input" id="entryAmount" placeholder="0" inputmode="numeric" min="0">
+    </div>
+
+    <div class="quick-amounts" id="quickAmounts"></div>
+
+    <div class="form-group">
+      <label class="form-label">Kategori</label>
+      <div class="cat-grid" id="catGrid"></div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Tanggal</label>
+        <input type="date" class="form-input" id="entryDate">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Jam</label>
+        <input type="time" class="form-input" id="entryTime">
+        <div class="auto-hint" id="autoHint">⏰ Otomatis: sekarang</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Catatan (opsional)</label>
+      <input type="text" class="form-input" id="entryNote" placeholder="Contoh: orderan pagi">
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeEntryModal()">Batal</button>
+      <button class="btn btn-primary" onclick="saveEntry()">Simpan</button>
+    </div>
+    <button id="btnDeleteEntry" class="btn btn-danger btn-sm" style="width:100%;margin-top:8px;display:none" onclick="deleteEntryFromModal()">🗑️ Hapus Entri</button>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div id="confirmModal" class="modal-overlay" onclick="if(event.target===this)closeConfirm()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="confirmTitle">Konfirmasi</div>
+      <button class="modal-close" onclick="closeConfirm()">✕</button>
+    </div>
+    <p id="confirmMsg" style="font-size:14px;color:var(--muted);margin:0 0 16px"></p>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeConfirm()">Batal</button>
+      <button class="btn btn-danger" id="confirmOk">Ya, Lanjut</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+'use strict';
+
+/* ================================================================
+   KONSTANTA
+   ================================================================ */
+const STORAGE_KEY = 'ojolku_v4';
+const CATS = {
+  income: [
+    { id: 'Trip', icon: '🏍️', label: 'Trip' },
+    { id: 'Tip', icon: '💵', label: 'Tip' },
+    { id: 'Bonus', icon: '🎁', label: 'Bonus' },
+    { id: 'Lainnya', icon: '📦', label: 'Lain' }
+  ],
+  expense: [
+    { id: 'Bensin', icon: '⛽', label: 'Bensin' },
+    { id: 'Makan', icon: '🍽️', label: 'Makan' },
+    { id: 'Parkir', icon: '🅿️', label: 'Parkir' },
+    { id: 'Kuota', icon: '📱', label: 'Kuota' },
+    { id: 'Servis', icon: '🔧', label: 'Servis' },
+    { id: 'Tol', icon: '🛣️', label: 'Tol' },
+    { id: 'Cuci', icon: '🧼', label: 'Cuci' },
+    { id: 'Cicilan', icon: '🏦', label: 'Cicilan' },
+    { id: 'Lainnya', icon: '📦', label: 'Lain' }
+  ]
+};
+const CAT_MAP = {};
+[...CATS.income, ...CATS.expense].forEach(c => CAT_MAP[c.id] = c);
+
+/* ================================================================
+   STATE APLIKASI
+   ================================================================ */
+let state = {
+  entries: [],
+  shifts: [],
+  notes: {},
+  targets: { daily: 200000, monthly: 5000000 },
+  tracks: [],
+  activeTrackId: null,
+  selectedTrackId: null,
+  currentDate: todayKey(),
+  currentTab: 'home',
+  currentPeriod: 'month',
+  editingEntryId: null,
+  newEntryType: 'income',
+  selectedCategory: 'Trip'
+};
+
+/* ================================================================
+   RUNTIME TRACKING (tidak di-persist)
+   ================================================================ */
+let browserWatchId = null;    // Untuk browser: navigator.geolocation.watchPosition ID
+let nativeWatcherId = null;   // Untuk native: @capacitor-community/background-geolocation watcher ID
+let wakeLockRef = null;       // Wake Lock (browser only)
+let leafletMap = null;
+let mapPolyline = null;
+let mapStartMarker = null;
+let mapEndMarker = null;
+let mapLiveMarker = null;
+
+/* ================================================================
+   UTILS
+   ================================================================ */
+const $ = id => document.getElementById(id);
+const rp = n => 'Rp ' + Math.round(Number(n)||0).toLocaleString('id-ID');
+const rpShort = n => {
+  n = Math.round(Number(n)||0);
+  if (Math.abs(n) >= 1000000) return 'Rp ' + (n/1000000).toFixed(1).replace('.0','') + 'jt';
+  if (Math.abs(n) >= 1000) return 'Rp ' + Math.round(n/1000) + 'rb';
+  return 'Rp ' + n;
+};
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+function dateKey(ts){ const d = new Date(ts); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function todayKey(){ return dateKey(Date.now()); }
+const DAY_NAMES = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const MONTH_NAMES = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const MONTH_SHORT = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+function formatDateKey(key){
+  const [y,m,d] = key.split('-').map(Number);
+  const today = todayKey();
+  const yest = dateKey(Date.now()-86400000);
+  if (key === today) return 'Hari Ini';
+  if (key === yest) return 'Kemarin';
+  const dt = new Date(y, m-1, d);
+  return DAY_NAMES[dt.getDay()] + ', ' + d + ' ' + MONTH_SHORT[m-1];
+}
+function formatDateFull(key){
+  const [y,m,d] = key.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  return DAY_NAMES[dt.getDay()] + ', ' + d + ' ' + MONTH_NAMES[m-1] + ' ' + y;
+}
+function formatTime(ts){
+  const d = new Date(ts);
+  return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+function nowTimeStr(){
+  const d = new Date();
+  return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function toast(msg, type=''){
+  const el = $('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.className = 'toast ' + type, 2400);
+}
+function haversine(a, b){
+  const R=6371, t=x=>x*Math.PI/180;
+  const dLat=t(b.lat-a.lat), dLng=t(b.lng-a.lng);
+  const h=Math.sin(dLat/2)**2+Math.cos(t(a.lat))*Math.cos(t(b.lat))*Math.sin(dLng/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+
+/* ================================================================
+   STORAGE
+   ================================================================ */
+function loadState(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const d = JSON.parse(raw);
+      state.entries = d.entries || [];
+      state.shifts = d.shifts || [];
+      state.notes = d.notes || {};
+      state.targets = { ...state.targets, ...(d.targets || {}) };
+      state.tracks = d.tracks || [];
+      state.activeTrackId = d.activeTrackId || null;
+      state.currentDate = d.currentDate || todayKey();
+    }
+  } catch(e) { console.error('load', e); }
+}
+function persist(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      entries: state.entries,
+      shifts: state.shifts,
+      notes: state.notes,
+      targets: state.targets,
+      tracks: state.tracks,
+      activeTrackId: state.activeTrackId,
+      currentDate: state.currentDate
+    }));
+  } catch(e){
+    console.error('persist', e);
+    toast('⚠️ Penyimpanan penuh. Backup & hapus data lama.', 'error');
+  }
+}
+
+/* ================================================================
+   NAVIGASI
+   ================================================================ */
+function switchTab(tab){
+  state.currentTab = tab;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $('screen-' + tab).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+
+  if (tab === 'home') renderHome();
+  if (tab === 'history') renderHistory();
+  if (tab === 'stats') renderStats();
+  if (tab === 'settings') renderSettings();
+  if (tab === 'track') {
+    renderTrack();
+    setTimeout(async () => {
+      await initMap();
+      if (!leafletMap) return;
+      leafletMap.invalidateSize();
+      const t = state.selectedTrackId
+        ? state.tracks.find(x => x.id === state.selectedTrackId)
+        : getActiveTrack();
+      if (t && t.points.length) renderTrackOnMap(t, true);
+    }, 200);
+  }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ================================================================
+   HELPERS
+   ================================================================ */
+function getDayEntries(key){ return state.entries.filter(e => e.date === key); }
+function sumBy(arr, type){
+  return arr.filter(e => e.type === type).reduce((s,e) => s + e.amount, 0);
+}
+function getMonthEntries(year, month){
+  return state.entries.filter(e => {
+    const [y,m] = e.date.split('-').map(Number);
+    return y === year && m === month;
+  });
+}
+function getDaysInMonth(year, month){ return new Date(year, month, 0).getDate(); }
+
+/* ================================================================
+   HOME
+   ================================================================ */
+function changeDate(delta){
+  const [y,m,d] = state.currentDate.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  dt.setDate(dt.getDate() + delta);
+  if (dt.getTime() > Date.now() + 86400000) return;
+  state.currentDate = dateKey(dt);
+  persist();
+  renderHome();
+}
+function openDatePicker(){
+  const input = document.createElement('input');
+  input.type = 'date';
+  input.value = state.currentDate;
+  input.max = todayKey();
+  input.style.position = 'fixed';
+  input.style.opacity = '0';
+  input.style.pointerEvents = 'none';
+  document.body.appendChild(input);
+  input.addEventListener('change', () => {
+    if (input.value) { state.currentDate = input.value; persist(); renderHome(); }
+    try { document.body.removeChild(input); } catch(e){}
+  });
+  input.click();
+  setTimeout(() => { try { document.body.removeChild(input); } catch(e){} }, 60000);
+}
+
+function renderHome(){
+  const key = state.currentDate;
+  const entries = getDayEntries(key);
+  const income = sumBy(entries, 'income');
+  const expense = sumBy(entries, 'expense');
+  const net = income - expense;
+  const incomeCount = entries.filter(e => e.type === 'income').length;
+
+  const [cy, cm] = todayKey().split('-').map(Number);
+  const monthEntries = getMonthEntries(cy, cm);
+  const monthNet = sumBy(monthEntries, 'income') - sumBy(monthEntries, 'expense');
+  $('headerMonthNet').textContent = rpShort(monthNet);
+  $('headerSub').textContent = MONTH_NAMES[cm-1] + ' ' + cy;
+
+  $('dateMain').textContent = formatDateKey(key);
+  $('dateSub').textContent = formatDateFull(key);
+  $('btnNextDay').disabled = key >= todayKey();
+
+  $('dayIncome').textContent = rp(income);
+  $('dayIncomeMeta').textContent = incomeCount + ' entri';
+  $('dayExpense').textContent = rp(expense);
+  $('dayNet').textContent = rp(net);
+  $('dayNet').style.color = net >= 0 ? 'var(--blue)' : 'var(--red)';
+
+  const yest = dateKey(new Date(key + 'T00:00:00').getTime() - 86400000);
+  const yestIncome = sumBy(getDayEntries(yest), 'income');
+  if (yestIncome > 0 && income > 0) {
+    const diff = ((income - yestIncome) / yestIncome * 100);
+    const arrow = diff >= 0 ? '↑' : '↓';
+    const color = diff >= 0 ? '#a7f3d0' : '#fecaca';
+    $('dayIncomeCompare').innerHTML = `<span style="color:${color}">${arrow} ${Math.abs(diff).toFixed(0)}% vs kemarin</span>`;
+  } else {
+    $('dayIncomeCompare').textContent = '';
+  }
+
+  renderTarget(income, state.targets.daily);
+  renderShiftCard(key, income);
+  renderEntriesList(entries);
+  $('dailyNotes').value = state.notes[key] || '';
+}
+
+function renderTarget(current, target){
+  const pct = target > 0 ? Math.min((current / target) * 100, 999) : 0;
+  const bar = $('targetBar');
+  bar.style.width = Math.min(pct, 100) + '%';
+  bar.className = 'progress-fill';
+  if (pct >= 100) bar.classList.add('done');
+  else if (pct >= 70) bar.classList.add('warn');
+  else if (pct < 30 && current === 0) bar.classList.add('danger');
+
+  $('targetPct').textContent = pct.toFixed(0) + '%';
+  $('targetSub').textContent = rp(target);
+  $('targetNow').textContent = rp(current) + ' tercapai';
+  const left = target - current;
+  if (left > 0) {
+    $('targetLeft').textContent = 'Kurang ' + rp(left);
+    $('targetLeft').style.color = 'var(--orange)';
+  } else {
+    $('targetLeft').textContent = '🎉 Tercapai!';
+    $('targetLeft').style.color = 'var(--green)';
+  }
+}
+
+function renderShiftCard(key, income){
+  const shift = state.shifts.find(s => s.date === key);
+  $('shiftStart').value = shift?.start || '';
+  $('shiftEnd').value = shift?.end || '';
+  const result = $('shiftResult');
+  const status = $('shiftStatus');
+
+  if (shift && shift.start && shift.end) {
+    const [sh, sm] = shift.start.split(':').map(Number);
+    const [eh, em] = shift.end.split(':').map(Number);
+    let minutes = (eh * 60 + em) - (sh * 60 + sm);
+    if (minutes < 0) minutes += 24 * 60;
+    const hours = minutes / 60;
+    const rate = hours > 0 ? Math.round(income / hours) : 0;
+    $('shiftDuration').textContent = (hours < 1 ? minutes + ' menit' : hours.toFixed(1) + ' jam');
+    $('shiftRate').textContent = rp(rate);
+    result.style.display = 'flex';
+    status.textContent = hours.toFixed(1) + ' jam kerja';
+    status.style.color = 'var(--green)';
+  } else if (shift && shift.start) {
+    result.style.display = 'none';
+    status.textContent = 'Mulai ' + shift.start;
+    status.style.color = 'var(--blue)';
+  } else {
+    result.style.display = 'none';
+    status.textContent = 'Belum diisi';
+    status.style.color = 'var(--muted)';
+  }
+}
+
+function saveShift(){
+  const key = state.currentDate;
+  const start = $('shiftStart').value;
+  const end = $('shiftEnd').value;
+  if (!start && !end) {
+    state.shifts = state.shifts.filter(s => s.date !== key);
+  } else {
+    let shift = state.shifts.find(s => s.date === key);
+    if (shift) { shift.start = start; shift.end = end; }
+    else { state.shifts.push({ id: uid(), date: key, start, end }); }
+  }
+  persist();
+  const income = sumBy(getDayEntries(key), 'income');
+  renderShiftCard(key, income);
+}
+
+let notesTimer;
+function saveNotes(){
+  clearTimeout(notesTimer);
+  notesTimer = setTimeout(() => {
+    state.notes[state.currentDate] = $('dailyNotes').value;
+    persist();
+  }, 400);
+}
+
+function renderEntriesList(entries){
+  if (entries.length === 0) {
+    $('entriesList').innerHTML = `<div class="entry-list"><div class="empty">
+      <div class="empty-icon">📭</div>Belum ada catatan. Ketuk + untuk menambah
+    </div></div>`;
+    return;
+  }
+  const sorted = [...entries].sort((a,b) => b.ts - a.ts);
+  $('entriesList').innerHTML = `<div class="entry-list">${sorted.map(e => {
+    const cat = CAT_MAP[e.category] || { icon: '📦', label: e.category };
+    const isInc = e.type === 'income';
+    return `<div class="entry-item" onclick="editEntry('${e.id}')">
+      <div class="entry-icon ${isInc?'':'exp'}">${cat.icon}</div>
+      <div class="entry-body">
+        <div class="entry-title">${escapeHtml(cat.label)}${e.note ? ' · '+escapeHtml(e.note) : ''}</div>
+        <div class="entry-sub">${formatTime(e.ts)}</div>
+      </div>
+      <div class="entry-amount ${isInc?'inc':'exp'}">${isInc?'+':'-'}${rp(e.amount).replace('Rp ','')}</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ================================================================
+   ENTRY MODAL (AUTO DATE/TIME)
+   ================================================================ */
+function openEntryModal(type, editId){
+  state.editingEntryId = editId || null;
+  state.newEntryType = type || 'income';
+
+  if (editId) {
+    const e = state.entries.find(x => x.id === editId);
+    if (!e) return;
+    state.newEntryType = e.type;
+    state.selectedCategory = e.category;
+    $('modalTitle').textContent = 'Edit Entri';
+    $('entryDate').value = e.date;
+    $('entryTime').value = formatTime(e.ts);
+    $('entryAmount').value = e.amount;
+    $('entryNote').value = e.note || '';
+    $('autoHint').style.display = 'none';
+    $('btnDeleteEntry').style.display = 'block';
+  } else {
+    $('modalTitle').textContent = type === 'income' ? 'Tambah Pendapatan' : 'Tambah Pengeluaran';
+    state.selectedCategory = CATS[type][0].id;
+    $('entryDate').value = state.currentDate;
+    $('entryTime').value = nowTimeStr();
+    $('entryAmount').value = '';
+    $('entryNote').value = '';
+    $('autoHint').style.display = 'flex';
+    $('btnDeleteEntry').style.display = 'none';
+  }
+
+  updateTypeUI();
+  $('entryModal').classList.add('show');
+  setTimeout(() => $('entryAmount').focus(), 100);
+}
+
+function closeEntryModal(){
+  $('entryModal').classList.remove('show');
+  state.editingEntryId = null;
+}
+
+function setEntryType(type){
+  state.newEntryType = type;
+  state.selectedCategory = CATS[type][0].id;
+  $('modalTitle').textContent = type === 'income' ? 'Tambah Pendapatan' : 'Tambah Pengeluaran';
+  updateTypeUI();
+}
+
+function updateTypeUI(){
+  const type = state.newEntryType;
+  document.querySelectorAll('#typeToggle button').forEach(b => {
+    b.classList.toggle('active', b.dataset.type === type);
+  });
+  renderCatGrid(type);
+  const quick = type === 'income'
+    ? [10000, 20000, 50000, 100000, 150000]
+    : [5000, 10000, 20000, 30000, 50000];
+  $('quickAmounts').innerHTML = quick.map(v =>
+    `<button class="quick-amount" onclick="setAmount(${v})">${v < 1000 ? v : (v/1000)+'rb'}</button>`
+  ).join('');
+}
+
+function renderCatGrid(type){
+  const cats = CATS[type];
+  $('catGrid').innerHTML = cats.map(c =>
+    `<button type="button" class="cat-btn ${type==='expense'?'exp':''} ${state.selectedCategory===c.id?'active':''}"
+      onclick="selectCategory('${c.id}')">
+      <span class="cat-emoji">${c.icon}</span>
+      <span>${c.label}</span>
+    </button>`
+  ).join('');
+}
+
+function selectCategory(id){
+  state.selectedCategory = id;
+  renderCatGrid(state.newEntryType);
+}
+
+function setAmount(v){
+  const input = $('entryAmount');
+  input.value = (Number(input.value) || 0) + v;
+  input.focus();
+}
+
+function editEntry(id){
+  const e = state.entries.find(x => x.id === id);
+  if (e) openEntryModal(e.type, id);
+}
+
+function saveEntry(){
+  const date = $('entryDate').value;
+  const time = $('entryTime').value || '12:00';
+  const amount = Number($('entryAmount').value);
+  const category = state.selectedCategory;
+  const note = $('entryNote').value.trim();
+
+  if (!date) { toast('Pilih tanggal', 'error'); return; }
+  if (!amount || amount <= 0) { toast('Nominal harus lebih dari 0', 'error'); return; }
+  if (!category) { toast('Pilih kategori', 'error'); return; }
+
+  const [h, m] = time.split(':').map(Number);
+  const dt = new Date(date + 'T00:00:00');
+  dt.setHours(h || 0, m || 0, 0, 0);
+  const ts = dt.getTime();
+
+  if (state.editingEntryId) {
+    const e = state.entries.find(x => x.id === state.editingEntryId);
+    if (e) {
+      e.date = date; e.ts = ts; e.amount = amount;
+      e.category = category; e.note = note; e.type = state.newEntryType;
+    }
+    toast('Entri diperbarui ✓', 'success');
+  } else {
+    state.entries.push({
+      id: uid(), type: state.newEntryType,
+      date, ts, amount, category, note
+    });
+    toast('Tersimpan! 💾', 'success');
+  }
+  persist();
+  closeEntryModal();
+  renderHome();
+}
+
+function deleteEntryFromModal(){
+  if (!state.editingEntryId) return;
+  confirmAction('Hapus entri ini?', () => {
+    state.entries = state.entries.filter(x => x.id !== state.editingEntryId);
+    persist();
+    closeEntryModal();
+    renderHome();
+    toast('Entri dihapus');
+  });
+}
+
+/* ================================================================
+   CONFIRM
+   ================================================================ */
+let confirmCallback = null;
+function confirmAction(msg, cb, title){
+  $('confirmMsg').textContent = msg;
+  $('confirmTitle').textContent = title || 'Konfirmasi';
+  confirmCallback = cb;
+  $('confirmModal').classList.add('show');
+  $('confirmOk').onclick = () => { closeConfirm(); if (confirmCallback) confirmCallback(); };
+}
+function closeConfirm(){ $('confirmModal').classList.remove('show'); confirmCallback = null; }
+
+/* ================================================================
+   HISTORY
+   ================================================================ */
+function renderHistory(){
+  const dates = new Set();
+  state.entries.forEach(e => dates.add(e.date));
+  const sorted = Array.from(dates).sort().reverse();
+
+  if (sorted.length === 0) {
+    $('historyList').innerHTML = `<div class="target-card"><div class="empty">
+      <div class="empty-icon">📅</div>Belum ada riwayat. Mulai catat pendapatan pertama!
+    </div></div>`;
+    return;
+  }
+
+  $('historyList').innerHTML = sorted.map(key => {
+    const entries = getDayEntries(key);
+    const income = sumBy(entries, 'income');
+    const expense = sumBy(entries, 'expense');
+    const net = income - expense;
+    const id = 'day-' + key.replace(/-/g,'');
+    return `<div class="history-day">
+      <div class="history-header" onclick="toggleHistory('${id}')">
+        <div>
+          <div class="history-date">${formatDateKey(key)}</div>
+          <div class="history-sub">${entries.length} entri · +${rpShort(income)} · −${rpShort(expense)}</div>
+        </div>
+        <div class="history-net ${net>=0?'pos':'neg'}">${rpShort(net)}</div>
+      </div>
+      <div class="history-details" id="${id}">
+        ${entries.sort((a,b) => b.ts - a.ts).map(e => {
+          const cat = CAT_MAP[e.category] || { icon:'📦', label:e.category };
+          const isInc = e.type === 'income';
+          return `<div class="entry-item" onclick="editEntry('${e.id}')">
+            <div class="entry-icon ${isInc?'':'exp'}">${cat.icon}</div>
+            <div class="entry-body">
+              <div class="entry-title">${escapeHtml(cat.label)}${e.note ? ' · '+escapeHtml(e.note) : ''}</div>
+              <div class="entry-sub">${formatTime(e.ts)}</div>
+            </div>
+            <div class="entry-amount ${isInc?'inc':'exp'}">${isInc?'+':'-'}${rp(e.amount).replace('Rp ','')}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleHistory(id){
+  const el = $(id);
+  if (el) el.classList.toggle('open');
+}
+
+/* ================================================================
+   STATISTIK
+   ================================================================ */
+function renderStats(){
+  const period = state.currentPeriod;
+  const now = new Date();
+  let year, month, startTs, endTs;
+
+  if (period === 'week') {
+    startTs = new Date(Date.now() - 6*86400000).setHours(0,0,0,0);
+    endTs = Date.now();
+  } else if (period === 'month') {
+    year = now.getFullYear(); month = now.getMonth() + 1;
+    startTs = new Date(year, month-1, 1).getTime();
+    endTs = Date.now();
+  } else if (period === 'lastmonth') {
+    const d = new Date(now.getFullYear(), now.getMonth()-1, 1);
+    year = d.getFullYear(); month = d.getMonth() + 1;
+    startTs = d.getTime();
+    endTs = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  } else {
+    startTs = 0; endTs = Date.now();
+  }
+
+  const inPeriod = state.entries.filter(e => e.ts >= startTs && e.ts < endTs);
+  const income = sumBy(inPeriod, 'income');
+  const expense = sumBy(inPeriod, 'expense');
+  const net = income - expense;
+  const uniqueDates = new Set(inPeriod.map(e => e.date));
+  const daysCount = uniqueDates.size;
+  const avg = daysCount > 0 ? Math.round(net / daysCount) : 0;
+
+  $('statIncome').textContent = rp(income);
+  $('statExpense').textContent = rp(expense);
+  $('statNet').textContent = rp(net);
+  $('statDays').textContent = daysCount + ' hari aktif';
+  $('statAvg').textContent = 'Rata² ' + rpShort(avg) + '/hari';
+
+  if (period === 'month') {
+    const target = state.targets.monthly;
+    const pct = target > 0 ? (income / target * 100) : 0;
+    $('monthTargetProgress').textContent = pct.toFixed(0) + '%';
+    $('monthTargetProgress').style.color = pct >= 100 ? 'var(--green)' : (pct >= 70 ? 'var(--primary)' : 'var(--orange)');
+    const daysInMonth = getDaysInMonth(year, month);
+    const daysLeft = daysInMonth - now.getDate();
+    $('monthDaysLeft').textContent = daysLeft + ' hari';
+  } else {
+    $('monthTargetProgress').textContent = '-';
+    $('monthTargetProgress').style.color = 'var(--muted)';
+    $('monthDaysLeft').textContent = '-';
+  }
+
+  const dayBuckets = {};
+  if (period === 'week') {
+    for (let i = 6; i >= 0; i--) dayBuckets[dateKey(Date.now() - i*86400000)] = 0;
+  } else if (period === 'month' || period === 'lastmonth') {
+    const dim = getDaysInMonth(year, month);
+    for (let d = 1; d <= dim; d++) {
+      dayBuckets[year + '-' + String(month).padStart(2,'0') + '-' + String(d).padStart(2,'0')] = 0;
+    }
+  } else {
+    const dateSet = new Set(state.entries.map(e => e.date));
+    Array.from(dateSet).sort().forEach(k => dayBuckets[k] = 0);
+  }
+  state.entries.forEach(e => {
+    if (dayBuckets[e.date] !== undefined) {
+      dayBuckets[e.date] += e.type === 'income' ? e.amount : -e.amount;
+    }
+  });
+
+  const keys = Object.keys(dayBuckets);
+  const vals = Object.values(dayBuckets);
+  const maxAbs = Math.max(...vals.map(Math.abs), 1);
+  const showLabels = keys.length <= 10;
+  $('statChart').innerHTML = keys.map((k, i) => {
+    const v = vals[i];
+    const h = Math.abs(v) / maxAbs * 100;
+    const dayNum = k.split('-')[2];
+    return `<div class="bar-wrapper" title="${k}: ${rp(v)}">
+      <div class="bar ${v<0?'neg':''}" style="height:${Math.max(h,3)}%"></div>
+      ${showLabels ? `<div class="bar-label">${dayNum}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  const dayNetMap = {};
+  inPeriod.forEach(e => {
+    if (!dayNetMap[e.date]) dayNetMap[e.date] = 0;
+    dayNetMap[e.date] += e.type === 'income' ? e.amount : -e.amount;
+  });
+  const dayArr = Object.entries(dayNetMap);
+  if (dayArr.length > 0) {
+    const sorted = [...dayArr].sort((a,b) => b[1] - a[1]);
+    $('bestDay').textContent = rpShort(sorted[0][1]);
+    $('bestDayDate').textContent = formatDateKey(sorted[0][0]);
+    const worst = sorted[sorted.length-1];
+    $('worstDay').textContent = rpShort(worst[1]);
+    $('worstDayDate').textContent = formatDateKey(worst[0]);
+  } else {
+    $('bestDay').textContent = '-'; $('bestDayDate').textContent = '';
+    $('worstDay').textContent = '-'; $('worstDayDate').textContent = '';
+  }
+
+  const expByCat = {};
+  inPeriod.filter(e => e.type === 'expense').forEach(e => {
+    expByCat[e.category] = (expByCat[e.category] || 0) + e.amount;
+  });
+  const catEntries = Object.entries(expByCat).sort((a,b) => b[1] - a[1]);
+  if (catEntries.length === 0) {
+    $('catBreakdown').innerHTML = '<div class="empty" style="padding:16px">Belum ada pengeluaran</div>';
+  } else {
+    const maxCat = catEntries[0][1];
+    $('catBreakdown').innerHTML = catEntries.map(([cat, amt]) => {
+      const c = CAT_MAP[cat] || { icon:'📦', label:cat };
+      const pct = (amt / maxCat) * 100;
+      const pctOfTotal = (amt / expense * 100).toFixed(0);
+      return `<div class="cat-item">
+        <div class="cat-icon">${c.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between">
+            <span class="cat-name">${escapeHtml(c.label)}</span>
+            <span class="cat-amount">${rp(amt)} <span style="color:var(--muted);font-weight:500">(${pctOfTotal}%)</span></span>
+          </div>
+          <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${pct}%"></div></div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+/* ================================================================
+   SETTINGS
+   ================================================================ */
+function renderSettings(){
+  $('settingDailyTarget').value = state.targets.daily;
+  $('settingMonthlyTarget').value = state.targets.monthly;
+
+  const info = $('aboutPlatform');
+  if (window.IS_NATIVE) {
+    info.innerHTML = '🟢 Mode: <strong style="color:var(--green)">APK Native</strong> — GPS background aktif (via foreground service).';
+  } else {
+    info.innerHTML = '🔵 Mode: <strong style="color:var(--blue)">Browser Web</strong> — GPS hanya saat app terbuka.';
+  }
+}
+function saveSettings(){
+  state.targets.daily = Number($('settingDailyTarget').value) || 0;
+  state.targets.monthly = Number($('settingMonthlyTarget').value) || 0;
+  persist();
+  toast('Target diperbarui', 'success');
+}
+
+/* ================================================================
+   GPS TRACKING — CORE
+   ================================================================ */
+function getActiveTrack(){
+  return state.tracks.find(t => t.id === state.activeTrackId && !t.endTs);
+}
+
+function getTrackBtnState(){
+  const active = getActiveTrack();
+  if (!active) return 'start';
+  // Cek apakah watcher sedang jalan (browser atau native)
+  const watcherRunning = window.IS_NATIVE
+    ? (nativeWatcherId !== null)
+    : (browserWatchId !== null);
+  return watcherRunning ? 'stop' : 'resume';
+}
+
+// Callback tunggal dari browser maupun native → semua titik masuk sini
+function onTrackPos(pos){
+  const track = getActiveTrack();
+  if (!track) return;
+  const now = Date.now();
+  const p = {
+    lat: pos.coords.latitude,
+    lng: pos.coords.longitude,
+    ts: now,
+    acc: Math.round(pos.coords.accuracy || 0)
+  };
+  const last = track.points[track.points.length-1];
+  const dist = last ? haversine(last, p) : 0;
+  // Simpan jika: pindah >20m atau >30 detik sejak titik terakhir
+  if (!last || dist > 0.02 || (now - last.ts) > 30000) {
+    track.points.push(p);
+    track.distance += dist;
+    if (track.points.length > 3000) track.points.shift();
+    persist();
+    if (state.currentTab === 'track') {
+      renderTrack();
+      if (leafletMap) renderTrackOnMap(track, false);
+    }
+  }
+}
+
+function onTrackErr(err){
+  console.warn('[GPS] error', err);
+}
+
+/* -------------------- NATIVE (CAPACITOR) -------------------- */
+async function startNativeWatcher(){
+  const bg = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.BackgroundGeolocation;
+  if (!bg) {
+    toast('Plugin background geolocation tidak ditemukan. Cek instalasi Capacitor.', 'error');
+    return false;
+  }
+  try {
+    nativeWatcherId = await bg.addWatcher(
+      {
+        backgroundMessage: 'OjolKu sedang merekam perjalanan Anda',
+        backgroundTitle: 'Tracking Perjalanan Aktif',
+        requestPermissions: true,
+        stale: false,
+        distanceFilter: 20
+      },
+      (location, error) => {
+        if (error) { console.error('[BG] error', error); return; }
+        if (location) {
+          onTrackPos({
+            coords: {
+              latitude: location.latitude,
+              longitude: location.longitude,
+              accuracy: location.accuracy || 0
+            }
+          });
+        }
+      }
+    );
+    console.log('[BG] watcher started:', nativeWatcherId);
+    return true;
+  } catch(e) {
+    console.error('[BG] failed to start', e);
+    toast('Gagal memulai GPS background: ' + (e.message || e), 'error');
+    return false;
+  }
+}
+
+async function stopNativeWatcher(){
+  const bg = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.BackgroundGeolocation;
+  if (bg && nativeWatcherId) {
+    try { await bg.removeWatcher({ id: nativeWatcherId }); } catch(e){ console.warn(e); }
+    nativeWatcherId = null;
+  }
+}
+
+/* -------------------- BROWSER (FALLBACK) -------------------- */
+function startBrowserWatch(){
+  if (!navigator.geolocation) {
+    toast('GPS tidak didukung browser ini', 'error');
+    return;
+  }
+  if (browserWatchId !== null) navigator.geolocation.clearWatch(browserWatchId);
+  browserWatchId = navigator.geolocation.watchPosition(
+    onTrackPos, onTrackErr,
+    { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+  );
+}
+
+function stopBrowserWatch(){
+  if (browserWatchId !== null) {
+    navigator.geolocation.clearWatch(browserWatchId);
+    browserWatchId = null;
+  }
+}
+
+/* -------------------- WAKE LOCK (browser only) -------------------- */
+async function requestWakeLock(){
+  if (window.IS_NATIVE) return false; // Native foreground service sudah handle
+  if (!('wakeLock' in navigator)) return false;
+  try {
+    wakeLockRef = await navigator.wakeLock.request('screen');
+    return true;
+  } catch(e) { return false; }
+}
+function releaseWakeLock(){
+  if (wakeLockRef) {
+    try { wakeLockRef.release(); } catch(e){}
+    wakeLockRef = null;
+  }
+}
+
+/* -------------------- START / STOP / RESUME -------------------- */
+async function startTracking(){
+  try {
+    // Minta posisi awal (dipakai untuk seed titik pertama)
+    let initPos = null;
+
+    if (window.IS_NATIVE) {
+      // Native: plugin yang akan minta izin & kasih lokasi pertama via callback.
+      // Kita tetap seed dengan posisi kosong; callback akan isi.
+      toast('Memulai GPS native...', '');
+    } else {
+      // Browser: minta posisi sekali untuk seed
+      toast('Meminta izin GPS...', '');
+      initPos = await new Promise((res, rej) => {
+        navigator.geolocation.getCurrentPosition(res, rej, {
+          enableHighAccuracy: true, timeout: 15000, maximumAge: 0
+        });
+      });
+    }
+
+    const track = {
+      id: uid(),
+      startTs: Date.now(),
+      endTs: null,
+      distance: 0,
+      points: []
+    };
+    if (initPos) {
+      track.points.push({
+        lat: initPos.coords.latitude,
+        lng: initPos.coords.longitude,
+        ts: Date.now(),
+        acc: Math.round(initPos.coords.accuracy || 0)
+      });
+    }
+
+    state.tracks.push(track);
+    state.activeTrackId = track.id;
+    state.selectedTrackId = track.id;
+    persist();
+
+    if (window.IS_NATIVE) {
+      const ok = await startNativeWatcher();
+      if (!ok) {
+        // Rollback
+        state.tracks = state.tracks.filter(t => t.id !== track.id);
+        state.activeTrackId = null;
+        persist();
+        return;
+      }
+    } else {
+      await requestWakeLock();
+      startBrowserWatch();
+    }
+
+    await initMap();
+    setTimeout(() => {
+      if (leafletMap) {
+        leafletMap.invalidateSize();
+        renderTrackOnMap(track, true);
+      }
+    }, 200);
+
+    toast('🛰️ Tracking dimulai', 'success');
+    renderTrack();
+  } catch(e) {
+    let msg = 'Gagal mulai tracking';
+    if (e.code === 1) msg = 'Izin lokasi ditolak. Aktifkan GPS & izin browser.';
+    else if (e.code === 2) msg = 'Lokasi tidak tersedia. Coba di area terbuka.';
+    else if (e.code === 3) msg = 'Timeout GPS. Coba lagi.';
+    else if (e.message) msg = e.message;
+    toast(msg, 'error');
+  }
+}
+
+async function resumeTracking(){
+  if (window.IS_NATIVE) {
+    const ok = await startNativeWatcher();
+    if (ok) toast('Tracking background dilanjutkan', 'success');
+  } else {
+    await requestWakeLock();
+    startBrowserWatch();
+    toast('Tracking dilanjutkan', 'success');
+  }
+  renderTrack();
+}
+
+function stopTracking(){
+  const track = getActiveTrack();
+  if (!track) return;
+  confirmAction('Akhiri tracking? Jejak perjalanan tetap disimpan.', async () => {
+    track.endTs = Date.now();
+    state.activeTrackId = null;
+
+    if (window.IS_NATIVE) {
+      await stopNativeWatcher();
+    } else {
+      stopBrowserWatch();
+      releaseWakeLock();
+    }
+
+    persist();
+    toast('Tracking dihentikan ✓', 'success');
+    renderTrack();
+  });
+}
+
+function toggleTracking(){
+  const s = getTrackBtnState();
+  if (s === 'start') startTracking();
+  else if (s === 'resume') resumeTracking();
+  else if (s === 'stop') stopTracking();
+}
+
+/* ================================================================
+   PETA LEAFLET
+   ================================================================ */
+async function initMap(){
+  if (leafletMap) return;
+  const mapEl = $('map');
+  if (!mapEl) return;
+  mapEl.classList.remove('empty-map');
+  mapEl.innerHTML = '';
+  leafletMap = L.map('map', { zoomControl: true }).setView([-6.2, 106.8], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap', maxZoom: 19
+  }).addTo(leafletMap);
+}
+
+function clearMapLayers(){
+  if (!leafletMap) return;
+  if (mapPolyline) { leafletMap.removeLayer(mapPolyline); mapPolyline = null; }
+  if (mapStartMarker) { leafletMap.removeLayer(mapStartMarker); mapStartMarker = null; }
+  if (mapEndMarker) { leafletMap.removeLayer(mapEndMarker); mapEndMarker = null; }
+  if (mapLiveMarker) { leafletMap.removeLayer(mapLiveMarker); mapLiveMarker = null; }
+}
+
+function renderTrackOnMap(track, fit){
+  if (!leafletMap || !track || !track.points || !track.points.length) return;
+  clearMapLayers();
+  const coords = track.points.map(p => [p.lat, p.lng]);
+  mapPolyline = L.polyline(coords, { color: '#0f766e', weight: 5, opacity: 0.9 }).addTo(leafletMap);
+  mapStartMarker = L.circleMarker(coords[0], {
+    radius: 7, color: '#fff', weight: 3, fillColor: '#16a34a', fillOpacity: 1
+  }).addTo(leafletMap).bindPopup('🟢 Mulai');
+  if (track.endTs) {
+    mapEndMarker = L.circleMarker(coords[coords.length-1], {
+      radius: 7, color: '#fff', weight: 3, fillColor: '#dc2626', fillOpacity: 1
+    }).addTo(leafletMap).bindPopup('🔴 Selesai');
+  } else {
+    mapLiveMarker = L.circleMarker(coords[coords.length-1], {
+      radius: 9, color: '#fff', weight: 3, fillColor: '#2563eb', fillOpacity: 1
+    }).addTo(leafletMap).bindPopup('📍 Sekarang');
+  }
+  if (fit) {
+    if (coords.length > 1) {
+      try { leafletMap.fitBounds(mapPolyline.getBounds(), { padding: [30, 30] }); }
+      catch(e) { leafletMap.setView(coords[0], 15); }
+    } else {
+      leafletMap.setView(coords[0], 16);
+    }
+  }
+}
+
+/* ================================================================
+   RENDER TAB TRACKING
+   ================================================================ */
+function renderTrack(){
+  // Sesuaikan banner peringatan berdasarkan platform
+  const warnBox = $('trackWarnBox');
+  if (window.IS_NATIVE) {
+    warnBox.className = 'warn-box native';
+    warnBox.innerHTML = `
+      <strong>🟢 GPS Background Aktif</strong><br>
+      APK ini merekam lokasi <strong>bahkan saat HP dikunci</strong>.
+      Pastikan izin "Lokasi: Sepanjang Waktu" sudah diberikan saat pertama kali mulai tracking.
+    `;
+  } else {
+    warnBox.className = 'warn-box';
+    warnBox.innerHTML = `
+      <strong>⚠️ GPS hanya jalan saat app terbuka</strong><br>
+      Taruh HP di holder + charger selama ngojek. Untuk tracking background, install versi APK.
+    `;
+  }
+
+  const active = getActiveTrack();
+  const btn = $('btnTrackToggle');
+  const label = $('trackLabel');
+  const sub = $('trackSub');
+  const btnState = getTrackBtnState();
+
+  if (active) {
+    label.innerHTML = '<span class="track-dot active"></span>Tracking aktif';
+    const running = window.IS_NATIVE ? (nativeWatcherId !== null) : (browserWatchId !== null);
+    if (running) {
+      sub.textContent = 'GPS merekam · ' + active.points.length + ' titik';
+    } else {
+      sub.textContent = 'GPS pause — tap Lanjutkan';
+    }
+    btn.textContent = btnState === 'stop' ? 'Hentikan' : 'Lanjutkan';
+    btn.className = 'btn-track ' + (btnState === 'stop' ? 'stop' : 'resume');
+    const dur = Math.round((Date.now() - active.startTs) / 60000);
+    $('trackDistance').textContent = active.distance.toFixed(2) + ' km';
+    $('trackDuration').textContent = dur < 60 ? dur + ' mnt' : (dur/60).toFixed(1) + ' jam';
+  } else {
+    label.innerHTML = '<span class="track-dot"></span>Tidak aktif';
+    sub.textContent = 'Tap Mulai untuk tracking perjalanan';
+    btn.textContent = 'Mulai';
+    btn.className = 'btn-track';
+    const selected = state.selectedTrackId ? state.tracks.find(t => t.id === state.selectedTrackId) : null;
+    if (selected && selected.endTs) {
+      const dur = Math.round((selected.endTs - selected.startTs) / 60000);
+      $('trackDistance').textContent = selected.distance.toFixed(2) + ' km';
+      $('trackDuration').textContent = dur < 60 ? dur + ' mnt' : (dur/60).toFixed(1) + ' jam';
+    } else {
+      $('trackDistance').textContent = '0 km';
+      $('trackDuration').textContent = '-';
+    }
+  }
+
+  const list = $('trackList');
+  const tracks = [...state.tracks].sort((a,b) => b.startTs - a.startTs);
+  if (tracks.length === 0) {
+    list.innerHTML = `<div class="target-card"><div class="empty" style="padding:20px">
+      <div class="empty-icon">🗺️</div>Belum ada sesi tracking
+    </div></div>`;
+    return;
+  }
+
+  list.innerHTML = tracks.slice(0, 30).map(t => {
+    const isActive = !t.endTs && t.id === state.activeTrackId;
+    const isSelected = t.id === state.selectedTrackId;
+    const dur = t.endTs ? Math.round((t.endTs - t.startTs)/60000) : Math.round((Date.now() - t.startTs)/60000);
+    const date = new Date(t.startTs);
+    const dateLabel = date.getDate() + '/' + (date.getMonth()+1) + ' · ' + formatTime(t.startTs);
+    const durLabel = dur < 60 ? dur + ' mnt' : (dur/60).toFixed(1) + ' jam';
+    return `<div class="track-session ${isSelected?'selected':''} ${isActive?'active-track':''}"
+        onclick="selectTrackSession('${t.id}')">
+      <div class="track-session-icon">${isActive ? '🟢' : '📍'}</div>
+      <div class="track-session-body">
+        <div class="track-session-title">${dateLabel}</div>
+        <div class="track-session-meta">${durLabel} · ${t.distance.toFixed(2)} km · ${t.points.length} titik</div>
+      </div>
+      <div class="track-session-arrow">›</div>
+    </div>`;
+  }).join('');
+}
+
+async function selectTrackSession(id){
+  state.selectedTrackId = id;
+  await initMap();
+  if (!leafletMap) return;
+  setTimeout(() => {
+    leafletMap.invalidateSize();
+    const t = state.tracks.find(x => x.id === id);
+    if (t && t.points.length) renderTrackOnMap(t, true);
+    renderTrack();
+  }, 100);
+}
+
+/* ================================================================
+   VISIBILITY CHANGE
+   - Browser: pause GPS + wake lock saat hidden
+   - Native: foreground service JALAN TERUS, jadi JANGAN stop watcher
+   ================================================================ */
+document.addEventListener('visibilitychange', () => {
+  if (window.IS_NATIVE) return; // Native tetap jalan
+  const active = getActiveTrack();
+  if (!active) return;
+  if (document.hidden) {
+    if (browserWatchId !== null) {
+      try { navigator.geolocation.clearWatch(browserWatchId); } catch(e){}
+      browserWatchId = null;
+    }
+    releaseWakeLock();
+    renderTrack();
+  } else {
+    if (state.activeTrackId && browserWatchId === null) {
+      toast('Kembali. Tap "Lanjutkan" untuk resume GPS.', '');
+    }
+  }
+});
+
+/* ================================================================
+   EXPORT
+   ================================================================ */
+function downloadFile(content, filename, mime){
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+}
+
+function exportJSON(){
+  const data = {
+    exportedAt: new Date().toISOString(),
+    entries: state.entries, shifts: state.shifts,
+    notes: state.notes, targets: state.targets, tracks: state.tracks
+  };
+  downloadFile(JSON.stringify(data, null, 2), 'ojolku-backup-' + todayKey() + '.json', 'application/json');
+  toast('Backup JSON diunduh ✓', 'success');
+}
+
+function exportCSV(){
+  let csv = 'Tanggal,Jam,Tipe,Kategori,Nominal,Catatan\n';
+  [...state.entries].sort((a,b) => a.ts - b.ts).forEach(e => {
+    csv += [e.date, formatTime(e.ts), e.type === 'income' ? 'Pendapatan' : 'Pengeluaran',
+      '"' + e.category.replace(/"/g,'""') + '"',
+      e.type === 'income' ? e.amount : -e.amount,
+      '"' + (e.note||'').replace(/"/g,'""') + '"'].join(',') + '\n';
+  });
+  downloadFile('\ufeff' + csv, 'ojolku-data-' + todayKey() + '.csv', 'text/csv;charset=utf-8');
+  toast('CSV diunduh ✓', 'success');
+}
+
+function exportTracksGeoJSON(){
+  const features = state.tracks.filter(t => t.points.length > 1).map(t => ({
+    type: 'Feature',
+    properties: {
+      startTs: new Date(t.startTs).toISOString(),
+      endTs: t.endTs ? new Date(t.endTs).toISOString() : null,
+      distanceKm: +t.distance.toFixed(3),
+      points: t.points.length
+    },
+    geometry: {
+      type: 'LineString',
+      coordinates: t.points.map(p => [p.lng, p.lat])
+    }
+  }));
+  const geo = { type: 'FeatureCollection', features };
+  downloadFile(JSON.stringify(geo, null, 2),
+    'ojolku-tracks-' + todayKey() + '.geojson', 'application/geo+json');
+  toast('GeoJSON diunduh ✓ Buka di geojson.io', 'success');
+}
+
+function confirmReset(){
+  confirmAction('Hapus SEMUA data? Tidak bisa dibatalkan!', async () => {
+    state.entries = [];
+    state.shifts = [];
+    state.notes = {};
+    state.tracks = [];
+    state.activeTrackId = null;
+    state.selectedTrackId = null;
+
+    if (window.IS_NATIVE) {
+      await stopNativeWatcher();
+    } else {
+      stopBrowserWatch();
+      releaseWakeLock();
+    }
+
+    localStorage.removeItem(STORAGE_KEY);
+    persist();
+    toast('Semua data dihapus');
+    renderHome(); renderHistory(); renderStats(); renderTrack();
+  }, '⚠️ Reset Total');
+}
+
+/* ================================================================
+   INIT
+   ================================================================ */
+function init(){
+  loadState();
+
+  document.querySelectorAll('.period-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      state.currentPeriod = tab.dataset.period;
+      renderStats();
+    });
+  });
+
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    b.addEventListener('click', () => switchTab(b.dataset.tab));
+  });
+
+  renderHome();
+  renderHistory();
+  renderStats();
+  renderSettings();
+  renderTrack();
+
+  // Jika ada track aktif dari sesi sebelumnya (misal app sempat ditutup)
+  if (state.activeTrackId) {
+    setTimeout(() => {
+      toast('Ada tracking aktif sebelumnya. Buka tab Peta untuk melanjutkan.', '');
+    }, 800);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
