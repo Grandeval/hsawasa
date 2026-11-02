@@ -19,7 +19,6 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  /* Dark Mode (Default) */
   --bg:#0f172a; --card:#1e293b; --card-hover:#334155;
   --text:#f8fafc; --muted:#94a3b8; --border:#334155;
   --primary:#f59e0b; --primary-dark:#d97706; --primary-light:rgba(245,158,11,.15);
@@ -47,7 +46,6 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
   font-size:15px;line-height:1.5;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
 #app{max-width:600px;margin:0 auto;min-height:100vh;padding-bottom:90px}
 
-/* Header */
 .app-header{background:rgba(15,23,42,.8);backdrop-filter:blur(12px);padding:16px 20px;
   border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;transition:background .3s}
 body.light-mode .app-header{background:rgba(255,255,255,.85)}
@@ -64,7 +62,6 @@ main{padding:16px}
 .screen.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-/* Cards & Buttons */
 .card{background:var(--card);border-radius:20px;padding:20px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:16px}
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:14px;
   font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;padding:14px 20px;transition:all .2s}
@@ -74,7 +71,6 @@ main{padding:16px}
 .btn-danger{background:var(--red-light);color:var(--red)}
 .btn-sm{padding:8px 16px;font-size:12px;border-radius:10px}
 
-/* Circular Progress */
 .circle-progress-wrapper{display:flex;justify-content:center;align-items:center;margin:10px 0 20px;position:relative}
 .circle-svg{width:160px;height:160px;transform:rotate(-90deg)}
 .circle-bg{fill:none;stroke:var(--border);stroke-width:12}
@@ -85,7 +81,6 @@ main{padding:16px}
 .circle-pct{font-size:32px;font-weight:800;color:var(--text);line-height:1}
 .circle-label{font-size:12px;color:var(--muted);margin-top:4px;font-weight:600}
 
-/* Grid Stats */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
 .stat-box{background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--border)}
 .stat-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:4px}
@@ -94,7 +89,6 @@ main{padding:16px}
 .stat-val.red{color:var(--red)}
 .stat-val.blue{color:var(--blue)}
 
-/* Forms */
 .form-group{margin-bottom:16px}
 .form-label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
 .form-input,.form-select{width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:14px;
@@ -103,7 +97,6 @@ main{padding:16px}
 .amount-input{font-size:28px;text-align:center;padding:20px;font-weight:800;letter-spacing:1px;color:var(--primary)}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-/* Nav */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:600px;margin:0 auto;background:var(--card);
   display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--border);
   padding:8px 4px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(0,0,0,.1);z-index:100}
@@ -113,7 +106,6 @@ main{padding:16px}
 .nav-btn.active{color:var(--primary)}
 .nav-btn.active .nav-icon{transform:translateY(-2px) scale(1.1)}
 
-/* List Item */
 .list-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer}
 .list-item:last-child{border-bottom:none}
 .li-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;
@@ -124,7 +116,6 @@ main{padding:16px}
 .li-sub{font-size:11px;color:var(--muted);margin-top:2px;font-weight:500}
 .li-amount{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
 
-/* Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
 .modal-overlay.show{display:flex}
 .modal{background:var(--bg);border-radius:28px 28px 0 0;padding:24px;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.16,1,.3,1);border-top:1px solid var(--border)}
@@ -133,7 +124,6 @@ main{padding:16px}
 .modal-title{font-size:20px;font-weight:800}
 .modal-close{background:var(--border);border:none;width:36px;height:36px;border-radius:50%;font-size:18px;color:var(--text);cursor:pointer}
 
-/* Type Toggle & Cat Grid */
 .type-toggle{display:flex;background:var(--card);border-radius:14px;padding:4px;margin-bottom:20px;border:1px solid var(--border)}
 .type-toggle button{flex:1;background:transparent;border:none;padding:12px;border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;color:var(--muted);transition:all .2s;cursor:pointer}
 .type-toggle button.active[data-type="income"]{background:var(--green);color:#fff;box-shadow:0 2px 8px var(--green-light)}
@@ -145,10 +135,8 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
 .cat-btn.active.exp{border-color:var(--red);background:var(--red-light);color:var(--red)}
 .cat-emoji{font-size:24px}
 
-/* Custom Scroll */
 ::-webkit-scrollbar{width:0px;background:transparent}
 
-/* Toast & Misc */
 .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);color:var(--text);padding:14px 24px;border-radius:16px;font-size:14px;font-weight:600;box-shadow:var(--shadow-lg);z-index:1000;opacity:0;transition:all .3s;pointer-events:none;border:1px solid var(--border)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.success{border-color:var(--green);color:var(--green)}
@@ -160,7 +148,6 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
 .fab{position:fixed;bottom:90px;right:20px;width:60px;height:60px;border-radius:20px;background:var(--primary);color:#fff;border:none;font-size:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px var(--primary-light);z-index:99;cursor:pointer;transition:all .2s}
 .fab:active{transform:scale(.9) rotate(90deg)}
 
-/* Tabungan / Goals */
 .goal-card{background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--border);margin-bottom:12px}
 .goal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
 .goal-title{font-size:15px;font-weight:800}
@@ -170,15 +157,12 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-dark));border-radius:6px;transition:width .5s ease}
 .goal-actions{display:flex;gap:8px;margin-top:12px}
 
-/* Servis Card */
 .servis-card{background:linear-gradient(135deg,var(--card),var(--bg));border-radius:20px;padding:20px;border:1px solid var(--border);margin-bottom:16px;position:relative;overflow:hidden}
 .servis-card.warning{border-color:var(--orange);box-shadow:0 0 20px rgba(249,115,22,.15)}
 .servis-card.danger{border-color:var(--red);box-shadow:0 0 20px rgba(239,68,68,.15)}
 
-/* Charts */
 .chart-container{position:relative;height:200px;width:100%;margin-bottom:16px}
 
-/* PIN Lock */
 .pin-lock{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .pin-dots{display:flex;gap:16px;margin:32px 0}
 .pin-dot{width:16px;height:16px;border-radius:50%;background:var(--border);transition:background .2s}
@@ -198,7 +182,8 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
 </head>
 <body class="">
 
-<!-- PIN SCREEN -->
+<input type="file" id="restoreFile" accept=".json,application/json" style="display:none" onchange="handleRestoreFile(event)">
+
 <div id="pinScreen" class="pin-lock" style="display:none">
   <div style="font-size:32px;margin-bottom:16px">🔐</div>
   <h2 style="margin:0;font-size:18px">Masukkan PIN</h2>
@@ -236,7 +221,6 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
   </header>
 
   <main>
-    <!-- 1. BERANDA -->
     <section id="screen-home" class="screen active">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <button class="btn btn-sm btn-outline" onclick="changeDate(-1)">‹</button>
@@ -302,7 +286,6 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
       <div id="entriesList"></div>
     </section>
 
-    <!-- 2. JURNAL (RIWAYAT) -->
     <section id="screen-journal" class="screen">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <h2 style="margin:0;font-size:20px;font-weight:800">Riwayat Harian</h2>
@@ -310,7 +293,6 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
       <div id="historyList"></div>
     </section>
 
-    <!-- 3. PETA (GPS) -->
     <section id="screen-track" class="screen">
       <div class="card" id="trackWarnBox" style="margin-bottom:12px;padding:12px;font-size:12px;color:var(--muted);line-height:1.5">
       </div>
@@ -337,9 +319,11 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
 
       <div style="font-size:12px;font-weight:800;color:var(--muted);margin:24px 0 12px;text-transform:uppercase;letter-spacing:1px">Sesi Tracking</div>
       <div id="trackList"></div>
+
+      <div style="font-size:12px;font-weight:800;color:var(--muted);margin:24px 0 12px;text-transform:uppercase;letter-spacing:1px">Linimasa Jarak (30 Hari Terakhir)</div>
+      <div id="timelineList"></div>
     </section>
 
-    <!-- 4. TABUNGAN & UTANG -->
     <section id="screen-savings" class="screen">
       <h2 style="margin:0 0 16px;font-size:20px;font-weight:800">Tabungan & Target</h2>
       <button class="btn btn-primary" onclick="openGoalModal()" style="margin-bottom:16px">+ Buat Target Tabungan</button>
@@ -350,11 +334,9 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
       <div id="debtsList"></div>
     </section>
 
-    <!-- 5. LAINNYA (SETTINGS) -->
     <section id="screen-settings" class="screen">
       <h2 style="margin:0 0 16px;font-size:20px;font-weight:800">Lainnya</h2>
       
-      <!-- Reminder Servis Oli -->
       <div class="card">
         <div style="font-size:14px;font-weight:800;margin-bottom:12px">🛠️ Pengingat Servis Oli</div>
         
@@ -372,14 +354,12 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
         <button class="btn btn-outline" style="width:100%;border-color:var(--green);color:var(--green)" onclick="resetOil()">🔄 Sudah Ganti Oli (Reset 0 km)</button>
       </div>
 
-      <!-- Statistik -->
       <div class="card">
         <div style="font-size:14px;font-weight:800;margin-bottom:16px">📊 Statistik & Analitik</div>
         <div class="chart-container"><canvas id="chartExpense"></canvas></div>
         <div class="chart-container" style="height:180px"><canvas id="chartHours"></canvas></div>
       </div>
 
-      <!-- Pengaturan Umum -->
       <div class="card">
         <div style="font-size:14px;font-weight:800;margin-bottom:16px">⚙️ Pengaturan Aplikasi</div>
         <div class="form-group">
@@ -404,23 +384,25 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
         </div>
       </div>
 
-      <!-- Keamanan & Data -->
       <div class="card">
         <div style="font-size:14px;font-weight:800;margin-bottom:16px">🔐 Keamanan & Data</div>
         <button class="btn btn-outline" style="width:100%;margin-bottom:12px" onclick="setPIN()">Aktifkan / Ubah PIN</button>
-        <div class="grid-2">
-          <button class="btn btn-outline" onclick="exportJSON()">Backup JSON</button>
+        
+        <div class="grid-2" style="margin-bottom:12px">
+          <button class="btn btn-outline" style="border-color:var(--green);color:var(--green)" onclick="exportJSON()">📋 Copy Backup</button>
+          <button class="btn btn-outline" style="border-color:var(--primary);color:var(--primary)" onclick="openRestoreModal()">📥 Restore Data</button>
+        </div>
+        
+        <div class="grid-2" style="margin-bottom:12px">
           <button class="btn btn-outline" onclick="window.print()">Cetak PDF</button>
-        </div>
-        <div class="grid-2" style="margin-top:12px">
           <button class="btn btn-outline" onclick="exportCSV()">Export CSV</button>
-          <button class="btn btn-danger" onclick="confirmReset()">Reset Data</button>
         </div>
-        <div class="hint" style="text-align:center;margin-top:16px">Dompet Driver v5.1 • Data 100% Offline</div>
+        
+        <button class="btn btn-danger" style="width:100%" onclick="confirmReset()">Reset Semua Data</button>
+        <div class="hint" style="text-align:center;margin-top:16px">Dompet Driver v5.5 • Data 100% Offline</div>
       </div>
     </section>
 
-    <!-- PRINT AREA -->
     <div id="printArea" class="print-only" style="padding:20px">
       <h2 style="text-align:center">Laporan Keuangan Driver</h2>
       <p style="text-align:center" id="printDate">-</p>
@@ -450,7 +432,6 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
   <button class="fab" onclick="openEntryModal('income')">+</button>
 </div>
 
-<!-- MODAL ENTRY -->
 <div id="entryModal" class="modal-overlay" onclick="if(event.target===this)closeEntryModal()">
   <div class="modal">
     <div class="modal-header">
@@ -470,7 +451,6 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
 
     <div class="cat-grid" id="catGrid"></div>
 
-    <!-- Jarak Tempuh (Khusus Trip) -->
     <div class="form-group" id="manualKmGroup" style="display:none">
       <label class="form-label">Jarak Tempuh (km) - Opsional</label>
       <input type="number" class="form-input" id="entryManualKm" placeholder="Misal: 15.5" step="0.1">
@@ -497,7 +477,28 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
   </div>
 </div>
 
-<!-- MODAL GOAL -->
+<div id="backupModal" class="modal-overlay" onclick="if(event.target===this)closeBackupModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="backupModalTitle">Backup Data</div>
+      <button class="modal-close" onclick="closeBackupModal()">✕</button>
+    </div>
+    
+    <div id="backupTextArea" style="display:none">
+      <div class="hint" style="margin-bottom:12px;font-size:13px">Data di bawah ini sudah <b>otomatis tercopy ke Clipboard HP kamu</b>. Silakan buka WhatsApp/Notes, lalu Paste (Tempel) di sana untuk menyimpannya.</div>
+      <textarea id="backupOutput" class="form-input" style="height:150px;font-size:10px;font-family:monospace" readonly></textarea>
+      <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="closeBackupModal()">Tutup</button>
+    </div>
+
+    <div id="restoreTextArea" style="display:none">
+      <div class="hint" style="margin-bottom:12px;font-size:13px">Paste (Tempel) teks backup JSON kamu ke dalam kotak di bawah ini, lalu klik Restore.</div>
+      <textarea id="restoreInput" class="form-input" style="height:150px;font-size:10px;font-family:monospace" placeholder='{"entries": [...]}'></textarea>
+      <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="processRestoreText()">Proses Restore</button>
+      <button class="btn btn-outline" style="width:100%;margin-top:8px" onclick="document.getElementById('restoreFile').click()">Atau Pilih File JSON</button>
+    </div>
+  </div>
+</div>
+
 <div id="goalModal" class="modal-overlay" onclick="if(event.target===this)closeGoalModal()">
   <div class="modal">
     <div class="modal-header">
@@ -516,7 +517,6 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
   </div>
 </div>
 
-<!-- MODAL DEBT -->
 <div id="debtModal" class="modal-overlay" onclick="if(event.target===this)closeDebtModal()">
   <div class="modal">
     <div class="modal-header">
@@ -545,9 +545,6 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
 <script>
 'use strict';
 
-/* ================================================================
-   KONSTANTA & STATE
-   ================================================================ */
 const STORAGE_KEY = 'dompet_driver_v5';
 const CATS = {
   income: [
@@ -576,7 +573,7 @@ let state = {
   goals: [], debts: [],
   settings: {
     daily: 200000, weekly: 1200000, monthly: 5000000,
-    darkMode: true, oilTargetKm: 2500, oilLastResetTs: 0, pin: null // FIX: Init 0 agar semua data terhitung
+    darkMode: true, oilTargetKm: 2500, oilLastResetTs: 0, pin: null
   },
   activeTrackId: null, selectedTrackId: null,
   currentDate: todayKey(), currentTab: 'home',
@@ -588,9 +585,6 @@ let browserWatchId = null, nativeWatcherId = null, wakeLockRef = null;
 let leafletMap = null, mapPolyline = null, mapStartMarker = null, mapEndMarker = null, mapLiveMarker = null;
 let chartExpenseObj = null, chartHoursObj = null;
 
-/* ================================================================
-   UTILS
-   ================================================================ */
 const $ = id => document.getElementById(id);
 const rp = n => 'Rp ' + Math.round(Number(n)||0).toLocaleString('id-ID');
 const rpShort = n => {
@@ -630,31 +624,38 @@ function haversine(a, b){
   return 2*R*Math.asin(Math.sqrt(h));
 }
 
-/* ================================================================
-   STORAGE & INIT
-   ================================================================ */
 function loadState(){
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const d = JSON.parse(raw);
       Object.assign(state, d);
-      // FIX: Pastikan oilLastResetTs ada. Kalau undefined, set ke 0 (hitung semua).
       if (state.settings.oilLastResetTs === undefined) state.settings.oilLastResetTs = 0;
       if (!state.settings.oilTargetKm) state.settings.oilTargetKm = 2500;
     }
   } catch(e) { console.error('load', e); }
 }
 function persist(){
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch(e) { toast('Penyimpanan penuh!', 'error'); }
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } 
+  catch(e) { toast('Penyimpanan penuh!', 'error'); }
+}
+
+function pruneOldTracks() {
+  const thirtyDaysAgo = Date.now() - (30 * 86400000);
+  let changed = false;
+  state.tracks.forEach(t => {
+    if (t.startTs < thirtyDaysAgo && t.points && t.points.length > 0) {
+      t.points = [];
+      changed = true;
+    }
+  });
+  if (changed) persist();
 }
 
 function init(){
   loadState();
+  pruneOldTracks();
   
-  // Cek PIN
   if (state.settings.pin) {
     $('pinScreen').style.display = 'flex';
   } else {
@@ -663,7 +664,6 @@ function init(){
     startApp();
   }
   
-  // Set Dark Mode
   if (!state.settings.darkMode) document.body.classList.add('light-mode');
 }
 
@@ -696,7 +696,6 @@ function startApp() {
   $('entryDate').value = today;
   $('entryTime').value = nowTimeStr();
 
-  // Load settings inputs
   $('setDailyTarget').value = state.settings.daily;
   $('setWeeklyTarget').value = state.settings.weekly;
   $('setMonthlyTarget').value = state.settings.monthly;
@@ -712,9 +711,6 @@ function startApp() {
   checkDailyReminder();
 }
 
-/* ================================================================
-   NAVIGASI
-   ================================================================ */
 function switchTab(tab){
   state.currentTab = tab;
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -727,21 +723,19 @@ function switchTab(tab){
   if (tab === 'settings') renderSettings();
   if (tab === 'track') {
     renderTrack();
+    renderTimeline();
     setTimeout(() => {
       initMap();
       if (leafletMap) {
         leafletMap.invalidateSize();
         const t = state.selectedTrackId ? state.tracks.find(x => x.id === state.selectedTrackId) : getActiveTrack();
-        if (t && t.points.length) renderTrackOnMap(t, true);
+        if (t && t.points && t.points.length) renderTrackOnMap(t, true);
       }
     }, 200);
   }
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
-/* ================================================================
-   HOME & ENTRIES
-   ================================================================ */
 function changeDate(delta){
   const [y,m,d] = state.currentDate.split('-').map(Number);
   const dt = new Date(y, m-1, d);
@@ -760,34 +754,25 @@ function openDatePicker(){
 function getDayEntries(key){ return state.entries.filter(e => e.date === key); }
 function sumBy(arr, type){ return arr.filter(e => e.type === type).reduce((s,e) => s + e.amount, 0); }
 
-// === FUNGSI HITUNG JARAK OLI (FIXED) ===
 function getOilKmData() {
   const resetTs = state.settings.oilLastResetTs || 0;
-  let gpsKm = 0;
-  let manualKm = 0;
+  let gpsKm = 0, manualKm = 0;
 
-  // 1. Hitung dari GPS Track
   state.tracks.forEach(t => {
-    if (!t.points || t.points.length === 0) return;
-    // Jika track mulai setelah reset, ambil semua jaraknya
-    if (t.startTs >= resetTs) {
-      gpsKm += t.distance;
-    } 
-    // Jika track mulai sebelum reset tapi selesai setelah reset, hitung parsial (titik demi titik)
-    else if (!t.endTs || t.endTs > resetTs) {
-      for (let i = 1; i < t.points.length; i++) {
-        if (t.points[i].ts >= resetTs) {
-          gpsKm += haversine(t.points[i-1], t.points[i]);
+    if (!t.points || t.points.length === 0) {
+      if (t.startTs >= resetTs) gpsKm += t.distance;
+    } else {
+      if (t.startTs >= resetTs) gpsKm += t.distance;
+      else if (!t.endTs || t.endTs > resetTs) {
+        for (let i = 1; i < t.points.length; i++) {
+          if (t.points[i].ts >= resetTs) gpsKm += haversine(t.points[i-1], t.points[i]);
         }
       }
     }
   });
 
-  // 2. Hitung dari Manual Input
   state.entries.forEach(e => {
-    if (e.ts >= resetTs && e.manualKm) {
-      manualKm += Number(e.manualKm);
-    }
+    if (e.ts >= resetTs && e.manualKm) manualKm += Number(e.manualKm);
   });
 
   return { total: gpsKm + manualKm, gps: gpsKm, manual: manualKm };
@@ -795,9 +780,8 @@ function getOilKmData() {
 
 function updateOilUI() {
   const oilData = getOilKmData();
-  
-  // Update di Beranda (Alert)
   const targetKm = state.settings.oilTargetKm;
+  
   if (oilData.total >= targetKm) {
     $('oilAlert').style.display = 'block';
     $('oilAlert').className = 'servis-card danger';
@@ -812,7 +796,6 @@ function updateOilUI() {
     $('oilAlert').style.display = 'none';
   }
 
-  // Update di Menu Lainnya (Settings)
   if ($('currentOilKmDisplay')) {
     $('currentOilKmDisplay').textContent = Math.round(oilData.total) + ' km';
     $('oilBreakdownDisplay').innerHTML = `GPS: ${Math.round(oilData.gps)} km · Manual: ${Math.round(oilData.manual)} km`;
@@ -836,7 +819,6 @@ function renderHome(){
   $('dayNet').textContent = rp(net);
   $('dayNet').style.color = net >= 0 ? 'var(--green)' : 'var(--red)';
 
-  // Circular Progress
   const target = state.settings.daily;
   const pct = target > 0 ? Math.min((income / target) * 100, 100) : 0;
   $('targetPct').textContent = Math.round(pct) + '%';
@@ -844,10 +826,8 @@ function renderHome(){
   circle.style.strokeDashoffset = 440 - (440 * pct / 100);
   circle.className = 'circle-fill ' + (pct >= 100 ? 'done' : '');
 
-  // Update Oli
   updateOilUI();
 
-  // Insight
   const insight = $('insightBox');
   insight.style.display = 'none';
   if (income > 0 && key === todayKey()) {
@@ -859,7 +839,6 @@ function renderHome(){
     if (msg) { $('insightText').textContent = msg; insight.style.display = 'block'; }
   }
 
-  // List
   const sorted = [...entries].sort((a,b) => b.ts - a.ts);
   $('entriesList').innerHTML = sorted.length ? sorted.map(e => {
     const cat = CAT_MAP[e.category] || {icon:'📦', label:e.category};
@@ -875,9 +854,6 @@ function renderHome(){
   }).join('') : '<div class="empty"><div class="empty-icon">📭</div>Belum ada catatan</div>';
 }
 
-/* ================================================================
-   MODAL ENTRY
-   ================================================================ */
 function openEntryModal(type, editId){
   state.editingEntryId = editId || null;
   state.newEntryType = type || 'income';
@@ -923,8 +899,6 @@ function updateTypeUI(){
       <span class="cat-emoji">${c.icon}</span><span>${c.label}</span>
     </button>`
   ).join('');
-  
-  // Tampilkan input jarak hanya jika Income & Trip
   $('manualKmGroup').style.display = (type === 'income' && state.selectedCategory === 'Trip') ? 'block' : 'none';
 }
 function selectCategory(id){ state.selectedCategory = id; updateTypeUI(); }
@@ -951,16 +925,10 @@ function saveEntry(){
     state.entries.push({ id: uid(), type: state.newEntryType, date, ts: dt.getTime(), amount, category, note, manualKm });
     toast('Tersimpan 💾', 'success');
   }
-  persist(); 
-  closeEntryModal(); 
-  renderHome(); 
-  renderJournal();
-  updateOilUI(); // FIX: Langsung update jarak oli
+  persist(); closeEntryModal(); renderHome(); renderJournal(); updateOilUI();
+  if (state.currentTab === 'track') renderTimeline();
 }
 
-/* ================================================================
-   JURNAL
-   ================================================================ */
 function renderJournal(){
   const dates = new Set(state.entries.map(e => e.date));
   const sorted = Array.from(dates).sort().reverse();
@@ -993,11 +961,7 @@ function renderJournal(){
   }).join('') : '<div class="empty"><div class="empty-icon">📅</div>Belum ada riwayat</div>';
 }
 
-/* ================================================================
-   TABUNGAN & UTANG
-   ================================================================ */
 function renderSavings(){
-  // Goals
   $('goalsList').innerHTML = state.goals.length ? state.goals.map(g => {
     const pct = g.target > 0 ? Math.min((g.saved / g.target) * 100, 100) : 0;
     return `<div class="goal-card">
@@ -1020,7 +984,6 @@ function renderSavings(){
     </div>`;
   }).join('') : '<div class="empty" style="padding:20px"><div class="empty-icon">🎯</div>Belum ada target tabungan</div>';
 
-  // Debts
   $('debtsList').innerHTML = state.debts.length ? state.debts.map(d => {
     const isUtang = d.type === 'utang';
     return `<div class="list-item" style="background:var(--card);border-radius:16px;padding:16px;margin-bottom:8px;border:1px solid var(--border)">
@@ -1075,9 +1038,6 @@ function toggleDebtPaid(id) {
   d.paid = !d.paid; persist(); renderSavings();
 }
 
-/* ================================================================
-   STATISTIK & SETTINGS (LAINNYA)
-   ================================================================ */
 function saveSettings(){
   state.settings.daily = Number($('setDailyTarget').value) || 0;
   state.settings.weekly = Number($('setWeeklyTarget').value) || 0;
@@ -1108,10 +1068,7 @@ function setPIN(){
   persist();
 }
 
-function renderSettings(){
-  updateOilUI(); // FIX: Gunakan fungsi UI terpusat
-  renderCharts();
-}
+function renderSettings(){ updateOilUI(); renderCharts(); }
 
 function renderCharts(){
   const expData = {};
@@ -1151,12 +1108,7 @@ function renderCharts(){
     type: 'bar',
     data: {
       labels: Object.keys(hourData),
-      datasets: [{
-        label: 'Pendapatan (Rp)',
-        data: Object.values(hourData),
-        backgroundColor: '#f59e0b',
-        borderRadius: 6
-      }]
+      datasets: [{ label: 'Pendapatan (Rp)', data: Object.values(hourData), backgroundColor: '#f59e0b', borderRadius: 6 }]
     },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
       scales: { x: { ticks: { color: textColor }, grid: { display: false } }, y: { ticks: { color: textColor }, grid: { color: 'rgba(255,255,255,.05)' } } }
@@ -1164,22 +1116,12 @@ function renderCharts(){
   });
 }
 
-/* ================================================================
-   REMINDER HARIAN
-   ================================================================ */
 function checkDailyReminder() {
   setInterval(() => {
-    const now = new Date();
-    const hours = now.getHours();
-    const mins = now.getMinutes();
-    const today = todayKey();
-    
+    const now = new Date(), hours = now.getHours(), mins = now.getMinutes(), today = todayKey();
     if (hours === 21 && mins === 0) {
-      const todayEntries = getDayEntries(today);
-      if (todayEntries.length === 0) {
-        if (Notification.permission === 'granted') {
-          new Notification('Dompet Driver', { body: 'Kamu belum mencatat pendapatan hari ini. Yuk isi sekarang!' });
-        }
+      if (getDayEntries(today).length === 0) {
+        if (Notification.permission === 'granted') new Notification('Dompet Driver', { body: 'Kamu belum mencatat pendapatan hari ini. Yuk isi sekarang!' });
       }
     }
   }, 60000);
@@ -1188,14 +1130,89 @@ if ('Notification' in window && Notification.permission !== 'granted' && Notific
   Notification.requestPermission();
 }
 
-/* ================================================================
-   EXPORT & PDF
-   ================================================================ */
-function exportJSON(){
-  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'dompet-driver-backup.json'; a.click();
-  toast('Backup JSON diunduh', 'success');
+function openRestoreModal() {
+  $('backupModalTitle').textContent = 'Restore Data';
+  $('backupTextArea').style.display = 'none';
+  $('restoreTextArea').style.display = 'block';
+  $('backupModal').classList.add('show');
 }
+function closeBackupModal() { $('backupModal').classList.remove('show'); }
+
+function exportJSON(){
+  $('backupModalTitle').textContent = 'Backup Data';
+  $('backupTextArea').style.display = 'block';
+  $('restoreTextArea').style.display = 'none';
+  
+  const jsonStr = JSON.stringify(state, null, 2);
+  $('backupOutput').value = jsonStr;
+  
+  // Fallback: Select the text so user can manually copy if clipboard fails
+  setTimeout(() => { $('backupOutput').select(); }, 100);
+
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(jsonStr).then(() => {
+      toast('Data tercopy! Silakan Paste di WA.', 'success');
+    }).catch(() => {
+      toast('Otomatis copy gagal. Silakan blok teks & copy manual.', 'error');
+    });
+  } else {
+    toast('Silakan blok teks di bawah & klik Copy manual.', 'info');
+  }
+  $('backupModal').classList.add('show');
+}
+
+function processRestoreText() {
+  const txt = $('restoreInput').value;
+  if (!txt || txt.trim() === '') return toast('Teks masih kosong', 'error');
+  try {
+    const data = JSON.parse(txt);
+    applyRestore(data);
+    closeBackupModal();
+  } catch(e) { toast('Format teks tidak valid!', 'error'); }
+}
+
+function handleRestoreFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try { applyRestore(JSON.parse(e.target.result)); closeBackupModal(); } 
+    catch(err) { toast('Gagal restore: File JSON rusak', 'error'); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function applyRestore(data) {
+  if (!data.entries) return toast('Format tidak sesuai', 'error');
+  
+  if (confirm("Yakin ingin me-restore data? Data saat ini akan DITIMPA.")) {
+    state.entries = data.entries || [];
+    state.shifts = data.shifts || [];
+    state.notes = data.notes || {};
+    state.tracks = data.tracks || [];
+    state.goals = data.goals || [];
+    state.debts = data.debts || [];
+    state.settings = { ...state.settings, ...(data.settings || {}) };
+    
+    if (state.settings.oilLastResetTs === undefined) state.settings.oilLastResetTs = 0;
+    if (!state.settings.oilTargetKm) state.settings.oilTargetKm = 2500;
+
+    persist();
+    renderHome(); renderJournal(); renderSavings(); renderTrack(); renderSettings();
+    
+    document.body.classList.toggle('light-mode', !state.settings.darkMode);
+    $('setDarkMode').checked = state.settings.darkMode;
+    $('setDailyTarget').value = state.settings.daily;
+    $('setWeeklyTarget').value = state.settings.weekly;
+    $('setMonthlyTarget').value = state.settings.monthly;
+    $('setOilTargetKm').value = state.settings.oilTargetKm;
+    
+    toast('Data berhasil di-restore! 🎉', 'success');
+    switchTab('home');
+  }
+}
+
 function exportCSV(){
   let csv = 'Tanggal,Waktu,Tipe,Kategori,Jumlah,Jarak (km),Catatan\n';
   state.entries.sort((a,b)=>a.ts-b.ts).forEach(e => {
@@ -1205,23 +1222,16 @@ function exportCSV(){
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'dompet-driver.csv'; a.click();
   toast('CSV diunduh', 'success');
 }
+
 window.onbeforeprint = function() {
-  const today = todayKey();
-  const m = today.substring(0,7);
-  const monthEntries = state.entries.filter(e => e.date.startsWith(m));
+  const m = todayKey().substring(0,7), monthEntries = state.entries.filter(e => e.date.startsWith(m));
   const inc = sumBy(monthEntries, 'income'), exp = sumBy(monthEntries, 'expense');
-  
   $('printDate').textContent = 'Bulan: ' + MONTH_NAMES[new Date().getMonth()] + ' ' + new Date().getFullYear();
   $('printContent').innerHTML = `
     <table style="width:100%;border-collapse:collapse;margin-top:20px;font-size:12px">
       <tr style="background:#eee"><th style="padding:8px;border:1px solid #ccc">Tanggal</th><th style="padding:8px;border:1px solid #ccc">Kategori</th><th style="padding:8px;border:1px solid #ccc">Jarak</th><th style="padding:8px;border:1px solid #ccc">Nominal</th></tr>
       ${monthEntries.sort((a,b)=>a.ts-b.ts).map(e => `
-        <tr>
-          <td style="padding:8px;border:1px solid #ccc">${formatDateKey(e.date)}</td>
-          <td style="padding:8px;border:1px solid #ccc">${e.category} ${e.type==='income'?'(+)':'(-)'}</td>
-          <td style="padding:8px;border:1px solid #ccc">${e.manualKm ? e.manualKm+' km' : '-'}</td>
-          <td style="padding:8px;border:1px solid #ccc;text-align:right">${rp(e.amount)}</td>
-        </tr>
+        <tr><td style="padding:8px;border:1px solid #ccc">${formatDateKey(e.date)}</td><td style="padding:8px;border:1px solid #ccc">${e.category} ${e.type==='income'?'(+)':'(-)'}</td><td style="padding:8px;border:1px solid #ccc">${e.manualKm ? e.manualKm+' km' : '-'}</td><td style="padding:8px;border:1px solid #ccc;text-align:right">${rp(e.amount)}</td></tr>
       `).join('')}
       <tr style="font-weight:bold;background:#f9f9f9"><td colspan="3" style="padding:8px;border:1px solid #ccc;text-align:right">TOTAL PENDAPATAN</td><td style="padding:8px;border:1px solid #ccc;text-align:right">${rp(inc)}</td></tr>
       <tr style="font-weight:bold;background:#f9f9f9"><td colspan="3" style="padding:8px;border:1px solid #ccc;text-align:right">TOTAL PENGELUARAN</td><td style="padding:8px;border:1px solid #ccc;text-align:right">${rp(exp)}</td></tr>
@@ -1230,11 +1240,8 @@ window.onbeforeprint = function() {
   `;
 };
 
-/* ================================================================
-   TRACKING (Sama seperti versi sebelumnya)
-   ================================================================ */
 function getActiveTrack(){ return state.tracks.find(t => t.id === state.activeTrackId && !t.endTs); }
-function getTrackBtnState(){ const active = getActiveTrack(); if(!active) return 'start'; const isRunning = window.IS_NATIVE ? (nativeWatcherId!==null) : (browserWatchId!==null); return isRunning ? 'stop' : 'resume'; }
+function getTrackBtnState(){ const active = getActiveTrack(); if(!active) return 'start'; return (window.IS_NATIVE ? (nativeWatcherId!==null) : (browserWatchId!==null)) ? 'stop' : 'resume'; }
 
 function onTrackPos(pos){
   const track = getActiveTrack(); if (!track) return;
@@ -1243,8 +1250,8 @@ function onTrackPos(pos){
   if (!last || dist > 0.02 || (now - last.ts) > 30000) {
     track.points.push(p); track.distance += dist; if (track.points.length > 3000) track.points.shift();
     persist(); 
-    if (state.currentTab === 'track') { renderTrack(); if (leafletMap) renderTrackOnMap(track, false); }
-    updateOilUI(); // Update jarak oli saat tracking berjalan
+    if (state.currentTab === 'track') { renderTrack(); renderTimeline(); if (leafletMap) renderTrackOnMap(track, false); }
+    updateOilUI();
   }
 }
 
@@ -1274,20 +1281,17 @@ function releaseWakeLock(){ if (wakeLockRef) { wakeLockRef.release(); wakeLockRe
 async function startTracking(){
   try {
     let initPos = null;
-    if (!window.IS_NATIVE) {
-      initPos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }));
-    }
+    if (!window.IS_NATIVE) initPos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }));
     const track = { id: uid(), startTs: Date.now(), endTs: null, distance: 0, points: [] };
     if (initPos) track.points.push({ lat: initPos.coords.latitude, lng: initPos.coords.longitude, ts: Date.now(), acc: Math.round(initPos.coords.accuracy||0) });
     
     state.tracks.push(track); state.activeTrackId = track.id; state.selectedTrackId = track.id; persist();
-
     if (window.IS_NATIVE) { const ok = await startNativeWatcher(); if(!ok) return; }
     else { await requestWakeLock(); startBrowserWatch(); }
 
     await initMap();
     setTimeout(() => { if(leafletMap) { leafletMap.invalidateSize(); renderTrackOnMap(track, true); } }, 200);
-    toast('🛰️ Tracking dimulai', 'success'); renderTrack();
+    toast('🛰️ Tracking dimulai', 'success'); renderTrack(); renderTimeline();
   } catch(e) { toast('Gagal memulai GPS. Pastikan izin aktif.', 'error'); }
 }
 
@@ -1300,11 +1304,10 @@ async function resumeTracking(){
 function stopTracking(){
   const track = getActiveTrack(); if (!track) return;
   if(!confirm('Akhiri tracking perjalanan ini?')) return;
-  
   track.endTs = Date.now(); state.activeTrackId = null;
   if (window.IS_NATIVE) stopNativeWatcher();
   else { stopBrowserWatch(); releaseWakeLock(); }
-  persist(); toast('Tracking selesai ✓', 'success'); renderTrack();
+  persist(); toast('Tracking selesai ✓', 'success'); renderTrack(); renderTimeline();
 }
 
 function toggleTracking(){ const s = getTrackBtnState(); if(s==='start') startTracking(); else if(s==='resume') resumeTracking(); else if(s==='stop') stopTracking(); }
@@ -1326,12 +1329,11 @@ function clearMapLayers(){
 }
 
 function renderTrackOnMap(track, fit){
-  if (!leafletMap || !track || !track.points.length) return;
+  if (!leafletMap || !track || !track.points || !track.points.length) return;
   clearMapLayers();
   const coords = track.points.map(p => [p.lat, p.lng]);
   mapPolyline = L.polyline(coords, { color: '#f59e0b', weight: 5, opacity: 0.9 }).addTo(leafletMap);
   mapStartMarker = L.circleMarker(coords[0], { radius: 7, color: '#fff', weight: 3, fillColor: '#10b981', fillOpacity: 1 }).addTo(leafletMap).bindPopup('🟢 Mulai');
-  
   if (track.endTs) mapEndMarker = L.circleMarker(coords[coords.length-1], { radius: 7, color: '#fff', weight: 3, fillColor: '#ef4444', fillOpacity: 1 }).addTo(leafletMap).bindPopup('🔴 Selesai');
   else mapLiveMarker = L.circleMarker(coords[coords.length-1], { radius: 9, color: '#fff', weight: 3, fillColor: '#3b82f6', fillOpacity: 1 }).addTo(leafletMap).bindPopup('📍 Sekarang');
 
@@ -1344,8 +1346,7 @@ function renderTrack(){
   warn.innerHTML = window.IS_NATIVE ? '🟢 <b>GPS Aktif:</b> Bisa merekam walau layar mati.' : '⚠️ <b>Mode Web:</b> Jangan tutup app agar GPS jalan.';
   warn.style.borderLeft = window.IS_NATIVE ? '4px solid var(--green)' : '4px solid var(--orange)';
 
-  const active = getActiveTrack(), btn = $('btnTrackToggle'), label = $('trackLabel');
-  const state_ = getTrackBtnState();
+  const active = getActiveTrack(), btn = $('btnTrackToggle'), label = $('trackLabel'), state_ = getTrackBtnState();
 
   if (active) {
     label.innerHTML = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--green);margin-right:6px"></span>Tracking Aktif';
@@ -1364,21 +1365,53 @@ function renderTrack(){
   list.innerHTML = tracks.length ? tracks.slice(0, 10).map(t => {
     const d = new Date(t.startTs), isAct = !t.endTs && t.id === state.activeTrackId;
     const dur = t.endTs ? Math.round((t.endTs - t.startTs)/60000) : Math.round((Date.now() - t.startTs)/60000);
-    return `<div class="card" style="padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:12px;border-color:var(--${isAct?'green':'border'})" onclick="selectTrack('${t.id}')">
-      <div style="font-size:20px">${isAct?'🟢':'📍'}</div>
+    const hasPoints = t.points && t.points.length > 0;
+    return `<div class="card" style="padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:12px;border-color:var(--${isAct?'green':'border'})" onclick="${hasPoints ? `selectTrack('${t.id}')` : ''}">
+      <div style="font-size:20px">${isAct?'🟢':(hasPoints?'📍':'🗑️')}</div>
       <div style="flex:1">
         <div style="font-size:13px;font-weight:700">${d.getDate()}/${d.getMonth()+1} · ${formatTime(t.startTs)}</div>
-        <div style="font-size:11px;color:var(--muted)">${dur} mnt · ${t.distance.toFixed(1)} km</div>
+        <div style="font-size:11px;color:var(--muted)">${dur} mnt · ${t.distance.toFixed(1)} km ${hasPoints?'':'· Peta Dihapus'}</div>
       </div>
-      <div style="color:var(--muted)">›</div>
+      <div style="color:var(--muted)">${hasPoints ? '›' : ''}</div>
     </div>`;
   }).join('') : '<div class="empty">Belum ada riwayat tracking</div>';
 }
 
 function selectTrack(id){
+  const t = state.tracks.find(x=>x.id===id);
+  if (!t || !t.points || t.points.length === 0) return toast('Rute peta sudah dihapus (lebih dari 30 hari)', 'error');
   state.selectedTrackId = id;
   initMap();
-  setTimeout(() => { if(leafletMap) { leafletMap.invalidateSize(); renderTrackOnMap(state.tracks.find(x=>x.id===id), true); renderTrack(); } }, 100);
+  setTimeout(() => { if(leafletMap) { leafletMap.invalidateSize(); renderTrackOnMap(t, true); renderTrack(); } }, 100);
+}
+
+function renderTimeline(){
+  const list = $('timelineList'); if (!list) return;
+  let timeline = [];
+  state.tracks.forEach(t => { if (t.distance > 0) timeline.push({ type: 'gps', ts: t.startTs, km: t.distance }); });
+  state.entries.forEach(e => { if (e.manualKm > 0) timeline.push({ type: 'manual', ts: e.ts, km: e.manualKm, note: e.note, cat: e.category }); });
+  timeline.sort((a, b) => b.ts - a.ts);
+  
+  const thirtyDaysAgo = Date.now() - (30 * 86400000);
+  const recentTimeline = timeline.filter(item => item.ts >= thirtyDaysAgo);
+  
+  if (recentTimeline.length === 0) {
+    list.innerHTML = '<div class="empty" style="padding:20px"><div class="empty-icon">⏱️</div>Belum ada riwayat km 30 hari terakhir</div>';
+    return;
+  }
+  
+  list.innerHTML = recentTimeline.map(item => {
+    const d = new Date(item.ts), dateStr = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} · ${formatTime(item.ts)}`;
+    const isGps = item.type === 'gps';
+    return `<div class="list-item" style="padding:12px 0">
+      <div class="li-icon" style="background:var(--${isGps ? 'primary-light' : 'blue-light'}); color:var(--${isGps ? 'primary' : 'blue'})">${isGps ? '🛰️' : '⌨️'}</div>
+      <div class="li-body">
+        <div class="li-title">${isGps ? 'GPS Tracking' : 'Input Manual ('+ (item.note || 'Trip') +')'}</div>
+        <div class="li-sub">${dateStr}</div>
+      </div>
+      <div class="li-amount" style="color:var(--primary)">+${item.km.toFixed(2)} km</div>
+    </div>`;
+  }).join('');
 }
 
 window.addEventListener('DOMContentLoaded', init);
