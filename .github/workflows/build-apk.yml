@@ -28,25 +28,32 @@ jobs:
         with:
           packages: 'platform-tools'
 
-      - name: 5. Install npm dependencies
+      # INI KUNCI RAHASIANYA: Menyimpan keystore agar signature APK selalu sama
+      - name: 5. Cache Android Debug Keystore
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: android-debug-keystore-v1
+
+      - name: 6. Install npm dependencies
         run: npm install --no-audit --no-fund
 
-      - name: 6. Add Android platform
+      - name: 7. Add Android platform
         run: npx cap add android
 
-      - name: 7. Patch AndroidManifest.xml
+      - name: 8. Patch AndroidManifest.xml
         run: node patch.js
 
-      - name: 8. Capacitor sync
+      - name: 9. Capacitor sync
         run: npx cap sync android
 
-      - name: 9. Build Debug APK
+      - name: 10. Build Debug APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
 
-      - name: 10. Upload APK
+      - name: 11. Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: ojolku-apk
