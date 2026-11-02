@@ -361,6 +361,7 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
         <div style="background:var(--bg);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">
           <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:4px">Jarak Sejak Ganti Oli Terakhir</div>
           <div style="font-size:28px;font-weight:800;color:var(--primary)" id="currentOilKmDisplay">0 km</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px" id="oilBreakdownDisplay">GPS: 0 km · Manual: 0 km</div>
           <div style="font-size:11px;color:var(--muted);margin-top:4px" id="oilTargetInfo">Target: 2500 km</div>
         </div>
 
@@ -575,7 +576,7 @@ let state = {
   goals: [], debts: [],
   settings: {
     daily: 200000, weekly: 1200000, monthly: 5000000,
-    darkMode: true, oilTargetKm: 2500, oilLastResetTs: null, pin: null
+    darkMode: true, oilTargetKm: 2500, oilLastResetTs: 0, pin: null // FIX: Init 0 agar semua data terhitung
   },
   activeTrackId: null, selectedTrackId: null,
   currentDate: todayKey(), currentTab: 'home',
@@ -638,8 +639,9 @@ function loadState(){
     if (raw) {
       const d = JSON.parse(raw);
       Object.assign(state, d);
+      // FIX: Pastikan oilLastResetTs ada. Kalau undefined, set ke 0 (hitung semua).
+      if (state.settings.oilLastResetTs === undefined) state.settings.oilLastResetTs = 0;
       if (!state.settings.oilTargetKm) state.settings.oilTargetKm = 2500;
-      if (!state.settings.oilLastResetTs) state.settings.oilLastResetTs = Date.now(); // Set awal
     }
   } catch(e) { console.error('load', e); }
 }
@@ -758,15 +760,64 @@ function openDatePicker(){
 function getDayEntries(key){ return state.entries.filter(e => e.date === key); }
 function sumBy(arr, type){ return arr.filter(e => e.type === type).reduce((s,e) => s + e.amount, 0); }
 
-// === FUNGSI HITUNG JARAK OLI ===
-function getCurrentOilKm() {
+// === FUNGSI HITUNG JARAK OLI (FIXED) ===
+function getOilKmData() {
   const resetTs = state.settings.oilLastResetTs || 0;
-  let km = 0;
-  // 1. Dari GPS Tracking
-  state.tracks.forEach(t => { if (t.startTs >= resetTs) km += t.distance; });
-  // 2. Dari Input Manual Trip
-  state.entries.forEach(e => { if (e.ts >= resetTs && e.manualKm) km += Number(e.manualKm); });
-  return km;
+  let gpsKm = 0;
+  let manualKm = 0;
+
+  // 1. Hitung dari GPS Track
+  state.tracks.forEach(t => {
+    if (!t.points || t.points.length === 0) return;
+    // Jika track mulai setelah reset, ambil semua jaraknya
+    if (t.startTs >= resetTs) {
+      gpsKm += t.distance;
+    } 
+    // Jika track mulai sebelum reset tapi selesai setelah reset, hitung parsial (titik demi titik)
+    else if (!t.endTs || t.endTs > resetTs) {
+      for (let i = 1; i < t.points.length; i++) {
+        if (t.points[i].ts >= resetTs) {
+          gpsKm += haversine(t.points[i-1], t.points[i]);
+        }
+      }
+    }
+  });
+
+  // 2. Hitung dari Manual Input
+  state.entries.forEach(e => {
+    if (e.ts >= resetTs && e.manualKm) {
+      manualKm += Number(e.manualKm);
+    }
+  });
+
+  return { total: gpsKm + manualKm, gps: gpsKm, manual: manualKm };
+}
+
+function updateOilUI() {
+  const oilData = getOilKmData();
+  
+  // Update di Beranda (Alert)
+  const targetKm = state.settings.oilTargetKm;
+  if (oilData.total >= targetKm) {
+    $('oilAlert').style.display = 'block';
+    $('oilAlert').className = 'servis-card danger';
+    $('oilAlertTitle').textContent = 'Waktunya Ganti Oli!';
+    $('oilAlertDesc').textContent = `Sudah menempuh ${Math.round(oilData.total)} km (Target: ${targetKm} km). Segera ganti oli!`;
+  } else if (oilData.total >= targetKm * 0.8) {
+    $('oilAlert').style.display = 'block';
+    $('oilAlert').className = 'servis-card warning';
+    $('oilAlertTitle').textContent = 'Ingat Ganti Oli';
+    $('oilAlertDesc').textContent = `Sudah menempuh ${Math.round(oilData.total)} km. Sisa ${Math.round(targetKm - oilData.total)} km lagi.`;
+  } else {
+    $('oilAlert').style.display = 'none';
+  }
+
+  // Update di Menu Lainnya (Settings)
+  if ($('currentOilKmDisplay')) {
+    $('currentOilKmDisplay').textContent = Math.round(oilData.total) + ' km';
+    $('oilBreakdownDisplay').innerHTML = `GPS: ${Math.round(oilData.gps)} km · Manual: ${Math.round(oilData.manual)} km`;
+    $('oilTargetInfo').textContent = `Target: ${targetKm} km`;
+  }
 }
 
 function renderHome(){
@@ -793,22 +844,8 @@ function renderHome(){
   circle.style.strokeDashoffset = 440 - (440 * pct / 100);
   circle.className = 'circle-fill ' + (pct >= 100 ? 'done' : '');
 
-  // Oil Reminder (Berdasarkan KM)
-  const currentKm = getCurrentOilKm();
-  const targetKm = state.settings.oilTargetKm;
-  if (currentKm >= targetKm) {
-    $('oilAlert').style.display = 'block';
-    $('oilAlert').className = 'servis-card danger';
-    $('oilAlertTitle').textContent = 'Waktunya Ganti Oli!';
-    $('oilAlertDesc').textContent = `Sudah menempuh ${Math.round(currentKm)} km (Target: ${targetKm} km). Segera ganti oli!`;
-  } else if (currentKm >= targetKm * 0.8) {
-    $('oilAlert').style.display = 'block';
-    $('oilAlert').className = 'servis-card warning';
-    $('oilAlertTitle').textContent = 'Ingat Ganti Oli';
-    $('oilAlertDesc').textContent = `Sudah menempuh ${Math.round(currentKm)} km. Sisa ${Math.round(targetKm - currentKm)} km lagi.`;
-  } else {
-    $('oilAlert').style.display = 'none';
-  }
+  // Update Oli
+  updateOilUI();
 
   // Insight
   const insight = $('insightBox');
@@ -914,7 +951,11 @@ function saveEntry(){
     state.entries.push({ id: uid(), type: state.newEntryType, date, ts: dt.getTime(), amount, category, note, manualKm });
     toast('Tersimpan 💾', 'success');
   }
-  persist(); closeEntryModal(); renderHome(); renderJournal();
+  persist(); 
+  closeEntryModal(); 
+  renderHome(); 
+  renderJournal();
+  updateOilUI(); // FIX: Langsung update jarak oli
 }
 
 /* ================================================================
@@ -1045,12 +1086,12 @@ function saveSettings(){
 }
 function saveOilTarget(){
   state.settings.oilTargetKm = Number($('setOilTargetKm').value) || 2500;
-  persist(); renderSettings(); renderHome(); toast('Target oli disimpan', 'success');
+  persist(); renderSettings(); updateOilUI(); toast('Target oli disimpan', 'success');
 }
 function resetOil(){
   if(confirm('Apakah kamu sudah mengganti oli? Jarak akan di-reset menjadi 0 km.')) {
     state.settings.oilLastResetTs = Date.now();
-    persist(); renderSettings(); renderHome(); toast('Oli sudah diganti, jarak di-reset 0', 'success');
+    persist(); renderSettings(); updateOilUI(); toast('Oli sudah diganti, jarak di-reset 0', 'success');
   }
 }
 function toggleDarkMode(){
@@ -1068,9 +1109,7 @@ function setPIN(){
 }
 
 function renderSettings(){
-  const km = getCurrentOilKm();
-  $('currentOilKmDisplay').textContent = Math.round(km) + ' km';
-  $('oilTargetInfo').textContent = `Target: ${state.settings.oilTargetKm} km`;
+  updateOilUI(); // FIX: Gunakan fungsi UI terpusat
   renderCharts();
 }
 
@@ -1203,7 +1242,9 @@ function onTrackPos(pos){
   const last = track.points[track.points.length-1], dist = last ? haversine(last, p) : 0;
   if (!last || dist > 0.02 || (now - last.ts) > 30000) {
     track.points.push(p); track.distance += dist; if (track.points.length > 3000) track.points.shift();
-    persist(); if (state.currentTab === 'track') { renderTrack(); if (leafletMap) renderTrackOnMap(track, false); }
+    persist(); 
+    if (state.currentTab === 'track') { renderTrack(); if (leafletMap) renderTrackOnMap(track, false); }
+    updateOilUI(); // Update jarak oli saat tracking berjalan
   }
 }
 
