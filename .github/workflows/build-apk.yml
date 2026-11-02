@@ -24,7 +24,9 @@ jobs:
           java-version: '21'
 
       - name: 4. Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
 
       - name: 5. Install npm dependencies
         run: npm install --no-audit --no-fund
