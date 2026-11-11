@@ -266,10 +266,22 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
       <div class="card" style="background:linear-gradient(135deg,var(--card),var(--primary-light))">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase">Total Bersih</div>
+            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase">Total Bersih Hari Ini</div>
             <div style="font-size:24px;font-weight:800;color:var(--primary)" id="dayNet">Rp 0</div>
           </div>
           <div style="font-size:32px">💎</div>
+        </div>
+      </div>
+
+      <!-- RECAP MINGGUAN & BULANAN DI BERANDA -->
+      <div class="grid-2" style="margin-top:-4px">
+        <div class="stat-box" style="padding:12px">
+          <div class="stat-label" style="font-size:10px">📅 Minggu Ini</div>
+          <div class="stat-val" style="font-size:16px" id="homeWeekNet">Rp 0</div>
+        </div>
+        <div class="stat-box" style="padding:12px">
+          <div class="stat-label" style="font-size:10px">📆 Bulan Ini</div>
+          <div class="stat-val" style="font-size:16px" id="homeMonthNet">Rp 0</div>
         </div>
       </div>
 
@@ -337,6 +349,39 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
     <section id="screen-settings" class="screen">
       <h2 style="margin:0 0 16px;font-size:20px;font-weight:800">Lainnya</h2>
       
+      <!-- REKAP KEUANGAN (BARU) -->
+      <div class="card">
+        <div style="font-size:14px;font-weight:800;margin-bottom:12px">📅 Rekap Keuangan</div>
+        
+        <div id="recapTabs" class="type-toggle" style="background:var(--bg); padding:4px; margin-bottom:16px">
+          <button data-type="today" onclick="changeRecapPeriod('today')" style="font-size:12px;padding:8px">Hari Ini</button>
+          <button data-type="week" onclick="changeRecapPeriod('week')" style="font-size:12px;padding:8px">7 Hari</button>
+          <button data-type="month" class="active" onclick="changeRecapPeriod('month')" style="font-size:12px;padding:8px">Bulan Ini</button>
+        </div>
+        
+        <div class="grid-2" style="margin-bottom:12px">
+          <div style="background:var(--bg);padding:12px;border-radius:12px;border:1px solid var(--border)">
+            <div style="font-size:11px;color:var(--muted);font-weight:600">Total Pendapatan</div>
+            <div style="font-size:16px;font-weight:800;color:var(--green)" id="recapIncome">Rp 0</div>
+          </div>
+          <div style="background:var(--bg);padding:12px;border-radius:12px;border:1px solid var(--border)">
+            <div style="font-size:11px;color:var(--muted);font-weight:600">Total Pengeluaran</div>
+            <div style="font-size:16px;font-weight:800;color:var(--red)" id="recapExpense">Rp 0</div>
+          </div>
+        </div>
+        <div style="background:var(--primary-light);padding:16px;border-radius:12px;border:1px solid var(--primary-dark)">
+          <div style="font-size:12px;color:var(--primary-dark);font-weight:700;text-transform:uppercase">Total Bersih</div>
+          <div style="font-size:24px;font-weight:800;color:var(--primary)" id="recapNet">Rp 0</div>
+        </div>
+      </div>
+
+      <!-- Statistik (Otomatis ikut Rekap) -->
+      <div class="card">
+        <div style="font-size:14px;font-weight:800;margin-bottom:16px">📊 Grafik & Analitik</div>
+        <div class="chart-container"><canvas id="chartExpense"></canvas></div>
+        <div class="chart-container" style="height:180px"><canvas id="chartHours"></canvas></div>
+      </div>
+
       <div class="card">
         <div style="font-size:14px;font-weight:800;margin-bottom:12px">🛠️ Pengingat Servis Oli</div>
         
@@ -352,12 +397,6 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
           <input type="number" class="form-input" id="setOilTargetKm" onchange="saveOilTarget()">
         </div>
         <button class="btn btn-outline" style="width:100%;border-color:var(--green);color:var(--green)" onclick="resetOil()">🔄 Sudah Ganti Oli (Reset 0 km)</button>
-      </div>
-
-      <div class="card">
-        <div style="font-size:14px;font-weight:800;margin-bottom:16px">📊 Statistik & Analitik</div>
-        <div class="chart-container"><canvas id="chartExpense"></canvas></div>
-        <div class="chart-container" style="height:180px"><canvas id="chartHours"></canvas></div>
       </div>
 
       <div class="card">
@@ -399,7 +438,7 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
         </div>
         
         <button class="btn btn-danger" style="width:100%" onclick="confirmReset()">Reset Semua Data</button>
-        <div class="hint" style="text-align:center;margin-top:16px">Dompet Driver v5.5 • Data 100% Offline</div>
+        <div class="hint" style="text-align:center;margin-top:16px">Dompet Driver v5.6 • Data 100% Offline</div>
       </div>
     </section>
 
@@ -578,7 +617,7 @@ let state = {
   activeTrackId: null, selectedTrackId: null,
   currentDate: todayKey(), currentTab: 'home',
   editingEntryId: null, newEntryType: 'income', selectedCategory: 'Trip',
-  newDebtType: 'utang'
+  newDebtType: 'utang', recapPeriod: 'month'
 };
 
 let browserWatchId = null, nativeWatcherId = null, wakeLockRef = null;
@@ -632,6 +671,7 @@ function loadState(){
       Object.assign(state, d);
       if (state.settings.oilLastResetTs === undefined) state.settings.oilLastResetTs = 0;
       if (!state.settings.oilTargetKm) state.settings.oilTargetKm = 2500;
+      if (!state.recapPeriod) state.recapPeriod = 'month';
     }
   } catch(e) { console.error('load', e); }
 }
@@ -645,8 +685,7 @@ function pruneOldTracks() {
   let changed = false;
   state.tracks.forEach(t => {
     if (t.startTs < thirtyDaysAgo && t.points && t.points.length > 0) {
-      t.points = [];
-      changed = true;
+      t.points = []; changed = true;
     }
   });
   if (changed) persist();
@@ -720,7 +759,7 @@ function switchTab(tab){
   if (tab === 'home') renderHome();
   if (tab === 'journal') renderJournal();
   if (tab === 'savings') renderSavings();
-  if (tab === 'settings') renderSettings();
+  if (tab === 'settings') { renderRecap(); renderSettings(); }
   if (tab === 'track') {
     renderTrack();
     renderTimeline();
@@ -754,6 +793,41 @@ function openDatePicker(){
 function getDayEntries(key){ return state.entries.filter(e => e.date === key); }
 function sumBy(arr, type){ return arr.filter(e => e.type === type).reduce((s,e) => s + e.amount, 0); }
 
+// === FUNGSI REKAP PERIODE ===
+function getFilteredEntries(period) {
+  const now = new Date();
+  let startTs = 0;
+  if (period === 'today') {
+    startTs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  } else if (period === 'week') {
+    startTs = new Date(Date.now() - 6*86400000).setHours(0,0,0,0);
+  } else if (period === 'month') {
+    startTs = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  }
+  return state.entries.filter(e => e.ts >= startTs);
+}
+
+function renderRecap() {
+  document.querySelectorAll('#recapTabs button').forEach(b => b.classList.toggle('active', b.dataset.type === state.recapPeriod));
+  
+  const entries = getFilteredEntries(state.recapPeriod);
+  const inc = sumBy(entries, 'income');
+  const exp = sumBy(entries, 'expense');
+  const net = inc - exp;
+
+  $('recapIncome').textContent = rp(inc);
+  $('recapExpense').textContent = rp(exp);
+  $('recapNet').textContent = rp(net);
+  $('recapNet').style.color = net >= 0 ? 'var(--primary)' : 'var(--red)';
+}
+
+function changeRecapPeriod(period) {
+  state.recapPeriod = period;
+  renderRecap();
+  renderCharts();
+}
+
+// === FUNGSI OLI ===
 function getOilKmData() {
   const resetTs = state.settings.oilLastResetTs || 0;
   let gpsKm = 0, manualKm = 0;
@@ -819,12 +893,25 @@ function renderHome(){
   $('dayNet').textContent = rp(net);
   $('dayNet').style.color = net >= 0 ? 'var(--green)' : 'var(--red)';
 
+  // Target Harian
   const target = state.settings.daily;
   const pct = target > 0 ? Math.min((income / target) * 100, 100) : 0;
   $('targetPct').textContent = Math.round(pct) + '%';
   const circle = $('circleFill');
   circle.style.strokeDashoffset = 440 - (440 * pct / 100);
   circle.className = 'circle-fill ' + (pct >= 100 ? 'done' : '');
+
+  // Rekap Minggu & Bulan di Beranda
+  const weekStart = new Date(Date.now() - 6*86400000).setHours(0,0,0,0);
+  const weekEntries = state.entries.filter(e => e.ts >= weekStart);
+  const weekNet = sumBy(weekEntries, 'income') - sumBy(weekEntries, 'expense');
+  $('homeWeekNet').textContent = rp(weekNet);
+
+  const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
+  const monthEntries = state.entries.filter(e => e.ts >= monthStart);
+  const monthNet = sumBy(monthEntries, 'income') - sumBy(monthEntries, 'expense');
+  $('homeMonthNet').textContent = rp(monthNet);
+  $('headerMonthNet').textContent = rp(monthNet);
 
   updateOilUI();
 
@@ -927,6 +1014,7 @@ function saveEntry(){
   }
   persist(); closeEntryModal(); renderHome(); renderJournal(); updateOilUI();
   if (state.currentTab === 'track') renderTimeline();
+  renderRecap(); // Update rekap
 }
 
 function renderJournal(){
@@ -1071,10 +1159,12 @@ function setPIN(){
 function renderSettings(){ updateOilUI(); renderCharts(); }
 
 function renderCharts(){
+  const entriesToUse = getFilteredEntries(state.recapPeriod); // Gunakan data sesuai periode rekap
+  
   const expData = {};
   const hourData = { 'Pagi (6-11)':0, 'Siang (12-15)':0, 'Sore (16-18)':0, 'Malam (19-23)':0, 'Subuh (0-5)':0 };
   
-  state.entries.forEach(e => {
+  entriesToUse.forEach(e => {
     if (e.type === 'expense') expData[e.category] = (expData[e.category] || 0) + e.amount;
     if (e.type === 'income') {
       const h = new Date(e.ts).getHours();
@@ -1146,7 +1236,6 @@ function exportJSON(){
   const jsonStr = JSON.stringify(state, null, 2);
   $('backupOutput').value = jsonStr;
   
-  // Fallback: Select the text so user can manually copy if clipboard fails
   setTimeout(() => { $('backupOutput').select(); }, 100);
 
   if (navigator.clipboard && window.isSecureContext) {
