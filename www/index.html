@@ -19,165 +19,181 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#0f172a; --card:#1e293b; --card-hover:#334155;
-  --text:#f8fafc; --muted:#94a3b8; --border:#334155;
+  --bg:#0b1120; --card:#151e31; --card-hover:#1e293b;
+  --text:#f8fafc; --muted:#94a3b8; --border:rgba(255,255,255,.08);
   --primary:#f59e0b; --primary-dark:#d97706; --primary-light:rgba(245,158,11,.15);
   --green:#10b981; --green-light:rgba(16,185,129,.15);
   --red:#ef4444; --red-light:rgba(239,68,68,.15);
   --blue:#3b82f6; --blue-light:rgba(59,130,246,.15);
   --orange:#f97316; --orange-light:rgba(249,115,22,.15);
-  --shadow:0 4px 6px -1px rgba(0,0,0,.3), 0 2px 4px -1px rgba(0,0,0,.2);
-  --shadow-lg:0 10px 25px -5px rgba(0,0,0,.5);
+  --shadow:0 10px 25px -5px rgba(0,0,0,.4), 0 8px 10px -6px rgba(0,0,0,.2);
+  --shadow-glow:0 0 20px rgba(245,158,11,.3);
+  --radius:24px;
 }
 body.light-mode {
-  --bg:#f8fafc; --card:#ffffff; --card-hover:#f1f5f9;
-  --text:#0f172a; --muted:#64748b; --border:#e2e8f0;
+  --bg:#f1f5f9; --card:#ffffff; --card-hover:#f8fafc;
+  --text:#0f172a; --muted:#64748b; --border:rgba(0,0,0,.05);
   --primary:#d97706; --primary-dark:#b45309; --primary-light:#fef3c7;
   --green:#059669; --green-light:#d1fae5;
   --red:#dc2626; --red-light:#fee2e2;
   --blue:#2563eb; --blue-light:#dbeafe;
   --orange:#ea580c; --orange-light:#ffedd5;
-  --shadow:0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
-  --shadow-lg:0 10px 15px -3px rgba(0,0,0,.1);
+  --shadow:0 10px 25px -5px rgba(0,0,0,.05), 0 8px 10px -6px rgba(0,0,0,.01);
+  --shadow-glow:0 4px 15px rgba(217,119,6,.3);
 }
 
 html,body{margin:0;padding:0}
 body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);
   font-size:15px;line-height:1.5;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
-#app{max-width:600px;margin:0 auto;min-height:100vh;padding-bottom:90px}
+#app{max-width:600px;margin:0 auto;min-height:100vh;padding-bottom:100px}
 
-.app-header{background:rgba(15,23,42,.8);backdrop-filter:blur(12px);padding:16px 20px;
-  border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;transition:background .3s}
-body.light-mode .app-header{background:rgba(255,255,255,.85)}
+/* Glass Header */
+.app-header{background:rgba(11,17,32,.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;transition:all .3s}
+body.light-mode .app-header{background:rgba(241,245,249,.8)}
 .header-row{display:flex;justify-content:space-between;align-items:center}
 .app-title{font-size:20px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
 .app-title span{color:var(--primary)}
-.header-sub{font-size:11px;color:var(--muted);margin-top:2px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
-.header-net{text-align:right}
-.header-net-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-.header-net-val{font-size:16px;font-weight:800;color:var(--primary)}
+.header-sub{font-size:11px;color:var(--muted);margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.header-net{text-align:right;background:var(--primary-light);padding:6px 12px;border-radius:12px}
+.header-net-label{font-size:10px;color:var(--primary-dark);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.header-net-val{font-size:15px;font-weight:800;color:var(--primary)}
 
-main{padding:16px}
+main{padding:20px 16px}
 .screen{display:none;animation:fadeIn .3s ease}
 .screen.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-.card{background:var(--card);border-radius:20px;padding:20px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:16px}
-.btn{display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:14px;
+/* Elegant Cards */
+.card{background:var(--card);border-radius:var(--radius);padding:20px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:16px;position:relative;overflow:hidden}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:16px;
   font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;padding:14px 20px;transition:all .2s}
 .btn:active{transform:scale(.96)}
-.btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 12px var(--primary-light)}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:var(--shadow-glow)}
 .btn-outline{background:transparent;color:var(--text);border:2px solid var(--border)}
 .btn-danger{background:var(--red-light);color:var(--red)}
-.btn-sm{padding:8px 16px;font-size:12px;border-radius:10px}
+.btn-sm{padding:8px 16px;font-size:12px;border-radius:12px}
 
-.circle-progress-wrapper{display:flex;justify-content:center;align-items:center;margin:10px 0 20px;position:relative}
+/* Circular Progress */
+.circle-progress-wrapper{display:flex;justify-content:center;align-items:center;margin:10px 0 24px;position:relative}
 .circle-svg{width:160px;height:160px;transform:rotate(-90deg)}
 .circle-bg{fill:none;stroke:var(--border);stroke-width:12}
 .circle-fill{fill:none;stroke:var(--primary);stroke-width:12;stroke-linecap:round;
-  stroke-dasharray:440;stroke-dashoffset:440;transition:stroke-dashoffset 1s ease-out, stroke .3s}
-.circle-fill.done{stroke:var(--green)}
+  stroke-dasharray:440;stroke-dashoffset:440;transition:stroke-dashoffset 1s ease-out, stroke .3s;filter:drop-shadow(0 0 8px var(--primary-light))}
+.circle-fill.done{stroke:var(--green);filter:drop-shadow(0 0 8px var(--green-light))}
 .circle-text{position:absolute;text-align:center}
-.circle-pct{font-size:32px;font-weight:800;color:var(--text);line-height:1}
-.circle-label{font-size:12px;color:var(--muted);margin-top:4px;font-weight:600}
+.circle-pct{font-size:36px;font-weight:800;color:var(--text);line-height:1}
+.circle-label{font-size:12px;color:var(--muted);margin-top:4px;font-weight:600;letter-spacing:.5px}
 
+/* Stat Boxes */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.stat-box{background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--border)}
-.stat-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.stat-box{background:var(--card);border-radius:20px;padding:16px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.stat-label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .stat-val{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
 .stat-val.green{color:var(--green)}
 .stat-val.red{color:var(--red)}
 .stat-val.blue{color:var(--blue)}
 
+/* Form Inputs */
 .form-group{margin-bottom:16px}
 .form-label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
-.form-input,.form-select{width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:14px;
-  font-size:15px;font-family:inherit;font-weight:600;background:var(--card);color:var(--text);outline:none;transition:border .2s}
-.form-input:focus,.form-select:focus{border-color:var(--primary)}
-.amount-input{font-size:28px;text-align:center;padding:20px;font-weight:800;letter-spacing:1px;color:var(--primary)}
+.form-input,.form-select{width:100%;padding:16px;border:2px solid var(--border);border-radius:16px;
+  font-size:15px;font-family:inherit;font-weight:600;background:var(--card);color:var(--text);outline:none;transition:all .2s}
+.form-input:focus,.form-select:focus{border-color:var(--primary);background:var(--bg)}
+.amount-input{font-size:32px;text-align:center;padding:24px;font-weight:800;letter-spacing:1px;color:var(--primary)}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
+/* Bottom Nav (Pill Style) */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:600px;margin:0 auto;background:var(--card);
   display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--border);
-  padding:8px 4px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(0,0,0,.1);z-index:100}
-.nav-btn{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:4px;
-  padding:6px 2px;color:var(--muted);cursor:pointer;font-family:inherit;font-size:10px;font-weight:600;transition:color .2s}
-.nav-btn .nav-icon{font-size:22px;line-height:1;transition:transform .2s}
+  padding:10px 4px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(0,0,0,.2);z-index:100}
+.nav-btn{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:6px 2px;color:var(--muted);cursor:pointer;font-family:inherit;font-size:10px;font-weight:600;transition:all .2s}
+.nav-btn .nav-icon-wrap{width:44px;height:32px;border-radius:16px;display:flex;align-items:center;justify-content:center;transition:all .3s}
+.nav-btn .nav-icon{font-size:20px;line-height:1;filter:grayscale(1);opacity:.6;transition:all .3s}
 .nav-btn.active{color:var(--primary)}
-.nav-btn.active .nav-icon{transform:translateY(-2px) scale(1.1)}
+.nav-btn.active .nav-icon-wrap{background:var(--primary-light)}
+.nav-btn.active .nav-icon{filter:none;opacity:1;transform:scale(1.1)}
 
-.list-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer}
+/* List Items */
+.list-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s}
 .list-item:last-child{border-bottom:none}
-.li-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+.list-item:active{background:var(--card-hover)}
+.li-icon{width:46px;height:46px;border-radius:16px;display:flex;align-items:center;justify-content:center;
   font-size:20px;flex-shrink:0;background:var(--primary-light);color:var(--primary)}
 .li-icon.exp{background:var(--red-light);color:var(--red)}
 .li-body{flex:1;min-width:0}
 .li-title{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.li-sub{font-size:11px;color:var(--muted);margin-top:2px;font-weight:500}
+.li-sub{font-size:11px;color:var(--muted);margin-top:4px;font-weight:500}
 .li-amount{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
 
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(8px)}
 .modal-overlay.show{display:flex}
-.modal{background:var(--bg);border-radius:28px 28px 0 0;padding:24px;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.16,1,.3,1);border-top:1px solid var(--border)}
+.modal{background:var(--bg);border-radius:32px 32px 0 0;padding:24px;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.16,1,.3,1);border-top:1px solid var(--border);box-shadow:0 -20px 40px rgba(0,0,0,.5)}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
-.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.modal-title{font-size:20px;font-weight:800}
-.modal-close{background:var(--border);border:none;width:36px;height:36px;border-radius:50%;font-size:18px;color:var(--text);cursor:pointer}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.modal-title{font-size:22px;font-weight:800}
+.modal-close{background:var(--card-hover);border:none;width:40px;height:40px;border-radius:50%;font-size:20px;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center}
 
-.type-toggle{display:flex;background:var(--card);border-radius:14px;padding:4px;margin-bottom:20px;border:1px solid var(--border)}
-.type-toggle button{flex:1;background:transparent;border:none;padding:12px;border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;color:var(--muted);transition:all .2s;cursor:pointer}
-.type-toggle button.active[data-type="income"]{background:var(--green);color:#fff;box-shadow:0 2px 8px var(--green-light)}
-.type-toggle button.active[data-type="expense"]{background:var(--red);color:#fff;box-shadow:0 2px 8px var(--red-light)}
-.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
-.cat-btn{background:var(--card);border:2px solid transparent;border-radius:14px;padding:12px 4px;display:flex;flex-direction:column;align-items:center;gap:6px;font-family:inherit;font-size:10px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s}
-.cat-btn.active{border-color:var(--primary);background:var(--primary-light);color:var(--primary-dark)}
+/* Type Toggle & Cat Grid */
+.type-toggle{display:flex;background:var(--card);border-radius:16px;padding:6px;margin-bottom:24px;border:1px solid var(--border)}
+.type-toggle button{flex:1;background:transparent;border:none;padding:14px;border-radius:12px;font-family:inherit;font-size:14px;font-weight:700;color:var(--muted);transition:all .3s;cursor:pointer}
+.type-toggle button.active[data-type="income"]{background:var(--green);color:#fff;box-shadow:0 4px 12px var(--green-light)}
+.type-toggle button.active[data-type="expense"]{background:var(--red);color:#fff;box-shadow:0 4px 12px var(--red-light)}
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.cat-btn{background:var(--card);border:2px solid transparent;border-radius:16px;padding:14px 4px;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:inherit;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s}
+.cat-btn.active{border-color:var(--primary);background:var(--primary-light);color:var(--primary-dark);transform:translateY(-2px);box-shadow:0 4px 12px var(--primary-light)}
 body.light-mode .cat-btn.active{color:var(--primary-dark)}
-.cat-btn.active.exp{border-color:var(--red);background:var(--red-light);color:var(--red)}
-.cat-emoji{font-size:24px}
+.cat-btn.active.exp{border-color:var(--red);background:var(--red-light);color:var(--red);box-shadow:0 4px 12px var(--red-light)}
+.cat-emoji{font-size:26px}
 
-::-webkit-scrollbar{width:0px;background:transparent}
+/* Floating Action Button */
+.fab{position:fixed;bottom:100px;right:20px;width:64px;height:64px;border-radius:24px;background:var(--primary);color:#fff;border:none;font-size:36px;
+  display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-glow);z-index:99;cursor:pointer;transition:all .3s cubic-bezier(.175,.885,.32,1.275)}
+.fab:active{transform:scale(.85) rotate(90deg)}
 
-.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);color:var(--text);padding:14px 24px;border-radius:16px;font-size:14px;font-weight:600;box-shadow:var(--shadow-lg);z-index:1000;opacity:0;transition:all .3s;pointer-events:none;border:1px solid var(--border)}
+/* Misc */
+.toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);color:var(--text);padding:16px 24px;border-radius:16px;font-size:14px;font-weight:600;box-shadow:var(--shadow);z-index:1000;opacity:0;transition:all .3s;pointer-events:none;border:1px solid var(--border)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.success{border-color:var(--green);color:var(--green)}
-.toast.error{border-color:var(--red);color:var(--red)}
+.toast.success{border-left:4px solid var(--green);color:var(--green)}
+.toast.error{border-left:4px solid var(--red);color:var(--red)}
 
 .hint{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5}
 .empty{text-align:center;padding:40px 20px;color:var(--muted)}
 .empty-icon{font-size:48px;margin-bottom:12px;opacity:.5}
-.fab{position:fixed;bottom:90px;right:20px;width:60px;height:60px;border-radius:20px;background:var(--primary);color:#fff;border:none;font-size:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px var(--primary-light);z-index:99;cursor:pointer;transition:all .2s}
-.fab:active{transform:scale(.9) rotate(90deg)}
-
-.goal-card{background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--border);margin-bottom:12px}
-.goal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
-.goal-title{font-size:15px;font-weight:800}
-.goal-target{font-size:12px;color:var(--muted);margin-top:2px}
-.goal-pct{font-size:16px;font-weight:800;color:var(--primary)}
-.progress-track{height:12px;background:var(--bg);border-radius:6px;overflow:hidden;border:1px solid var(--border)}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-dark));border-radius:6px;transition:width .5s ease}
-.goal-actions{display:flex;gap:8px;margin-top:12px}
-
-.servis-card{background:linear-gradient(135deg,var(--card),var(--bg));border-radius:20px;padding:20px;border:1px solid var(--border);margin-bottom:16px;position:relative;overflow:hidden}
+.goal-card{background:var(--card);border-radius:20px;padding:20px;border:1px solid var(--border);margin-bottom:12px;box-shadow:var(--shadow)}
+.goal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.goal-title{font-size:16px;font-weight:800}
+.goal-target{font-size:12px;color:var(--muted);margin-top:4px;font-weight:600}
+.goal-pct{font-size:18px;font-weight:800;color:var(--primary)}
+.progress-track{height:10px;background:var(--bg);border-radius:5px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-dark));border-radius:5px;transition:width .5s ease}
+.goal-actions{display:flex;gap:8px;margin-top:16px}
+.servis-card{background:linear-gradient(135deg,var(--card),var(--bg));border-radius:20px;padding:20px;border:1px solid var(--border);margin-bottom:16px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
 .servis-card.warning{border-color:var(--orange);box-shadow:0 0 20px rgba(249,115,22,.15)}
 .servis-card.danger{border-color:var(--red);box-shadow:0 0 20px rgba(239,68,68,.15)}
-
 .chart-container{position:relative;height:200px;width:100%;margin-bottom:16px}
-
 .pin-lock{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .pin-dots{display:flex;gap:16px;margin:32px 0}
 .pin-dot{width:16px;height:16px;border-radius:50%;background:var(--border);transition:background .2s}
 .pin-dot.filled{background:var(--primary)}
 .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:280px}
-.pin-btn{width:70px;height:70px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;margin:auto;font-family:inherit}
-.pin-btn:active{background:var(--card-hover)}
+.pin-btn{width:72px;height:72px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;margin:auto;font-family:inherit;box-shadow:var(--shadow)}
+.pin-btn:active{background:var(--card-hover);transform:scale(.95)}
 
-@media print {
-  body { background: #fff !important; color: #000 !important; }
-  .app-header, .bottom-nav, .fab, .btn, .no-print { display: none !important; }
-  .card, .stat-box { border: 1px solid #ccc !important; box-shadow: none !important; }
-  .print-only { display: block !important; }
-}
-.print-only { display: none; }
+/* Jurnal Specific */
+.journal-card{background:var(--card);border-radius:20px;border:1px solid var(--border);margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow)}
+.journal-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;cursor:pointer;background:var(--card);transition:background .2s}
+.journal-header:active{background:var(--card-hover)}
+.journal-date{font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px}
+.journal-date-icon{width:8px;height:8px;border-radius:50%;background:var(--primary)}
+.journal-sub{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600}
+.journal-net{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;text-align:right}
+.journal-net.pos{color:var(--green)}
+.journal-net.neg{color:var(--red)}
+.journal-details{display:none;border-top:1px solid var(--border);padding:0 20px;background:var(--bg)}
+.journal-details.open{display:block;animation:fadeIn .3s ease}
 </style>
 </head>
 <body class="">
@@ -186,7 +202,7 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
 
 <div id="pinScreen" class="pin-lock" style="display:none">
   <div style="font-size:32px;margin-bottom:16px">🔐</div>
-  <h2 style="margin:0;font-size:18px">Masukkan PIN</h2>
+  <h2 style="margin:0;font-size:20px;font-weight:800">Masukkan PIN</h2>
   <div class="pin-dots" id="pinDots">
     <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
   </div>
@@ -221,22 +237,23 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
   </header>
 
   <main>
+    <!-- 1. BERANDA -->
     <section id="screen-home" class="screen active">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <button class="btn btn-sm btn-outline" onclick="changeDate(-1)">‹</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <button class="btn btn-sm btn-outline" onclick="changeDate(-1)" style="width:44px;height:44px;padding:0;border-radius:50%">‹</button>
         <div style="text-align:center;cursor:pointer" onclick="openDatePicker()">
-          <div style="font-size:15px;font-weight:800" id="dateMain">Hari Ini</div>
-          <div style="font-size:11px;color:var(--muted);font-weight:600" id="dateSub">-</div>
+          <div style="font-size:16px;font-weight:800" id="dateMain">Hari Ini</div>
+          <div style="font-size:11px;color:var(--muted);font-weight:600;margin-top:2px" id="dateSub">-</div>
         </div>
-        <button class="btn btn-sm btn-outline" onclick="changeDate(1)" id="btnNextDay">›</button>
+        <button class="btn btn-sm btn-outline" onclick="changeDate(1)" id="btnNextDay" style="width:44px;height:44px;padding:0;border-radius:50%">›</button>
       </div>
 
       <div id="oilAlert" class="servis-card warning" style="display:none">
-        <div style="display:flex;align-items:center;gap:12px">
-          <div style="font-size:28px">🛠️</div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="font-size:32px">🛠️</div>
           <div>
-            <div style="font-size:14px;font-weight:800;color:var(--text)" id="oilAlertTitle">Waktunya Ganti Oli!</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:2px" id="oilAlertDesc">-</div>
+            <div style="font-size:15px;font-weight:800;color:var(--text)" id="oilAlertTitle">Waktunya Ganti Oli!</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px;font-weight:500" id="oilAlertDesc">-</div>
           </div>
         </div>
       </div>
@@ -248,7 +265,7 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
         </svg>
         <div class="circle-text">
           <div class="circle-pct" id="targetPct">0%</div>
-          <div class="circle-label">Target Harian</div>
+          <div class="circle-label">TARGET HARIAN</div>
         </div>
       </div>
 
@@ -263,59 +280,62 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
         </div>
       </div>
 
-      <div class="card" style="background:linear-gradient(135deg,var(--card),var(--primary-light))">
+      <div class="card" style="background:linear-gradient(135deg,var(--card),var(--primary-light));border-color:var(--primary-light)">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div>
-            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase">Total Bersih Hari Ini</div>
-            <div style="font-size:24px;font-weight:800;color:var(--primary)" id="dayNet">Rp 0</div>
+            <div style="font-size:12px;font-weight:800;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.5px">Total Bersih Hari Ini</div>
+            <div style="font-size:28px;font-weight:800;color:var(--primary);margin-top:4px;font-variant-numeric:tabular-nums" id="dayNet">Rp 0</div>
           </div>
-          <div style="font-size:32px">💎</div>
+          <div style="font-size:40px;opacity:.8">💎</div>
         </div>
       </div>
 
       <div class="grid-2" style="margin-top:-4px">
-        <div class="stat-box" style="padding:12px">
+        <div class="stat-box" style="padding:16px;border-radius:16px">
           <div class="stat-label" style="font-size:10px">📅 Minggu Ini</div>
           <div class="stat-val" style="font-size:16px" id="homeWeekNet">Rp 0</div>
         </div>
-        <div class="stat-box" style="padding:12px">
+        <div class="stat-box" style="padding:16px;border-radius:16px">
           <div class="stat-label" style="font-size:10px">📆 Bulan Ini</div>
           <div class="stat-val" style="font-size:16px" id="homeMonthNet">Rp 0</div>
         </div>
       </div>
 
-      <div id="insightBox" class="card" style="display:none;border-left:4px solid var(--blue);padding:16px">
-        <div style="font-size:13px;font-weight:600;line-height:1.5" id="insightText"></div>
+      <div id="insightBox" class="card" style="display:none;border-left:4px solid var(--blue);padding:16px;background:var(--blue-light)">
+        <div style="font-size:13px;font-weight:700;color:var(--blue);line-height:1.5" id="insightText"></div>
       </div>
 
       <div class="grid-2">
-        <button class="btn btn-primary" style="background:var(--green);color:#fff" onclick="openEntryModal('income')">+ Pendapatan</button>
+        <button class="btn btn-primary" style="background:var(--green);color:#fff;box-shadow:0 4px 12px var(--green-light)" onclick="openEntryModal('income')">+ Pendapatan</button>
         <button class="btn btn-primary" style="background:var(--red-light);color:var(--red)" onclick="openEntryModal('expense')">- Pengeluaran</button>
       </div>
 
-      <div style="font-size:12px;font-weight:800;color:var(--muted);margin:24px 0 12px;text-transform:uppercase;letter-spacing:1px">Jurnal Hari Ini</div>
+      <div style="font-size:13px;font-weight:800;color:var(--muted);margin:28px 0 12px;text-transform:uppercase;letter-spacing:1px">Jurnal Hari Ini</div>
       <div id="entriesList"></div>
     </section>
 
+    <!-- 2. JURNAL -->
     <section id="screen-journal" class="screen">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <h2 style="margin:0;font-size:20px;font-weight:800">Riwayat Harian</h2>
+      <div style="margin-bottom:20px">
+        <h2 style="margin:0;font-size:24px;font-weight:800">Jurnal Harian</h2>
+        <p style="margin:4px 0 0;font-size:13px;color:var(--muted)">Arsip semua transaksi kamu dari hari ke hari.</p>
       </div>
       <div id="historyList"></div>
     </section>
 
+    <!-- 3. PETA -->
     <section id="screen-track" class="screen">
-      <div class="card" id="trackWarnBox" style="margin-bottom:12px;padding:12px;font-size:12px;color:var(--muted);line-height:1.5">
+      <div class="card" id="trackWarnBox" style="margin-bottom:16px;padding:14px;font-size:12px;color:var(--muted);line-height:1.5">
       </div>
-      <div class="track-header-card" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="track-header-card" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <div>
-          <div style="font-size:16px;font-weight:800" id="trackLabel"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--muted);margin-right:6px"></span>Tidak aktif</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px" id="trackSub">Siap merekam perjalanan</div>
+          <div style="font-size:18px;font-weight:800" id="trackLabel"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--muted);margin-right:8px"></span>Tidak aktif</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;font-weight:500" id="trackSub">Siap merekam perjalanan</div>
         </div>
-        <button class="btn btn-primary" id="btnTrackToggle" onclick="toggleTracking()" style="width:auto;padding:10px 20px;border-radius:20px">Mulai</button>
+        <button class="btn btn-primary" id="btnTrackToggle" onclick="toggleTracking()" style="width:auto;padding:12px 24px;border-radius:20px">Mulai</button>
       </div>
 
-      <div id="map" style="height:340px;border-radius:20px;border:1px solid var(--border);margin-bottom:16px;background:var(--card);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px">Peta akan muncul saat tracking aktif</div>
+      <div id="map" style="height:340px;border-radius:24px;border:1px solid var(--border);margin-bottom:16px;background:var(--card);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;box-shadow:var(--shadow)">Peta akan muncul saat tracking aktif</div>
 
       <div class="grid-2">
         <div class="stat-box">
@@ -328,114 +348,110 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
         </div>
       </div>
 
-      <div style="font-size:12px;font-weight:800;color:var(--muted);margin:24px 0 12px;text-transform:uppercase;letter-spacing:1px">Sesi Tracking</div>
+      <div style="font-size:13px;font-weight:800;color:var(--muted);margin:28px 0 12px;text-transform:uppercase;letter-spacing:1px">Sesi Tracking</div>
       <div id="trackList"></div>
 
-      <div style="font-size:12px;font-weight:800;color:var(--muted);margin:24px 0 12px;text-transform:uppercase;letter-spacing:1px">Linimasa Jarak (30 Hari Terakhir)</div>
+      <div style="font-size:13px;font-weight:800;color:var(--muted);margin:28px 0 12px;text-transform:uppercase;letter-spacing:1px">Linimasa Jarak (30 Hari)</div>
       <div id="timelineList"></div>
     </section>
 
+    <!-- 4. TABUNGAN -->
     <section id="screen-savings" class="screen">
-      <h2 style="margin:0 0 16px;font-size:20px;font-weight:800">Tabungan & Target</h2>
-      <button class="btn btn-primary" onclick="openGoalModal()" style="margin-bottom:16px">+ Buat Target Tabungan</button>
+      <h2 style="margin:0 0 20px;font-size:24px;font-weight:800">Tabungan & Target</h2>
+      <button class="btn btn-primary" onclick="openGoalModal()" style="margin-bottom:20px">+ Buat Target Tabungan</button>
       <div id="goalsList"></div>
 
-      <h2 style="margin:32px 0 16px;font-size:20px;font-weight:800">Catatan Utang / Piutang</h2>
-      <button class="btn btn-outline" onclick="openDebtModal()" style="margin-bottom:16px">+ Catat Utang/Piutang</button>
+      <h2 style="margin:32px 0 20px;font-size:24px;font-weight:800">Utang / Piutang</h2>
+      <button class="btn btn-outline" onclick="openDebtModal()" style="margin-bottom:20px">+ Catat Utang/Piutang</button>
       <div id="debtsList"></div>
     </section>
 
+    <!-- 5. LAINNYA -->
     <section id="screen-settings" class="screen">
-      <h2 style="margin:0 0 16px;font-size:20px;font-weight:800">Lainnya</h2>
+      <h2 style="margin:0 0 20px;font-size:24px;font-weight:800">Menu Lainnya</h2>
       
       <div class="card">
-        <div style="font-size:14px;font-weight:800;margin-bottom:12px">📅 Rekap Keuangan</div>
-        
-        <div id="recapTabs" class="type-toggle" style="background:var(--bg); padding:4px; margin-bottom:16px">
-          <button data-type="today" onclick="changeRecapPeriod('today')" style="font-size:12px;padding:8px">Hari Ini</button>
-          <button data-type="week" onclick="changeRecapPeriod('week')" style="font-size:12px;padding:8px">7 Hari</button>
-          <button data-type="month" class="active" onclick="changeRecapPeriod('month')" style="font-size:12px;padding:8px">Bulan Ini</button>
+        <div style="font-size:15px;font-weight:800;margin-bottom:16px">📅 Rekap Keuangan</div>
+        <div id="recapTabs" class="type-toggle" style="background:var(--bg); padding:6px; margin-bottom:20px">
+          <button data-type="today" onclick="changeRecapPeriod('today')" style="font-size:13px;padding:10px">Hari Ini</button>
+          <button data-type="week" onclick="changeRecapPeriod('week')" style="font-size:13px;padding:10px">7 Hari</button>
+          <button data-type="month" class="active" onclick="changeRecapPeriod('month')" style="font-size:13px;padding:10px">Bulan Ini</button>
         </div>
         
-        <div class="grid-2" style="margin-bottom:12px">
-          <div style="background:var(--bg);padding:12px;border-radius:12px;border:1px solid var(--border)">
-            <div style="font-size:11px;color:var(--muted);font-weight:600">Total Pendapatan</div>
-            <div style="font-size:16px;font-weight:800;color:var(--green)" id="recapIncome">Rp 0</div>
+        <div class="grid-2" style="margin-bottom:16px">
+          <div style="background:var(--bg);padding:16px;border-radius:16px;border:1px solid var(--border)">
+            <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Pendapatan</div>
+            <div style="font-size:18px;font-weight:800;color:var(--green);margin-top:4px" id="recapIncome">Rp 0</div>
           </div>
-          <div style="background:var(--bg);padding:12px;border-radius:12px;border:1px solid var(--border)">
-            <div style="font-size:11px;color:var(--muted);font-weight:600">Total Pengeluaran</div>
-            <div style="font-size:16px;font-weight:800;color:var(--red)" id="recapExpense">Rp 0</div>
+          <div style="background:var(--bg);padding:16px;border-radius:16px;border:1px solid var(--border)">
+            <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Pengeluaran</div>
+            <div style="font-size:18px;font-weight:800;color:var(--red);margin-top:4px" id="recapExpense">Rp 0</div>
           </div>
         </div>
-        <div style="background:var(--primary-light);padding:16px;border-radius:12px;border:1px solid var(--primary-dark)">
-          <div style="font-size:12px;color:var(--primary-dark);font-weight:700;text-transform:uppercase">Total Bersih</div>
-          <div style="font-size:24px;font-weight:800;color:var(--primary)" id="recapNet">Rp 0</div>
+        <div style="background:var(--primary-light);padding:20px;border-radius:16px;border:1px solid var(--primary-light)">
+          <div style="font-size:12px;color:var(--primary-dark);font-weight:800;text-transform:uppercase;letter-spacing:.5px">Total Bersih</div>
+          <div style="font-size:28px;font-weight:800;color:var(--primary);margin-top:4px" id="recapNet">Rp 0</div>
         </div>
       </div>
 
       <div class="card">
-        <div style="font-size:14px;font-weight:800;margin-bottom:16px">📊 Grafik & Analitik</div>
+        <div style="font-size:15px;font-weight:800;margin-bottom:20px">📊 Grafik & Analitik</div>
         <div class="chart-container"><canvas id="chartExpense"></canvas></div>
         <div class="chart-container" style="height:180px"><canvas id="chartHours"></canvas></div>
       </div>
 
       <div class="card">
-        <div style="font-size:14px;font-weight:800;margin-bottom:12px">🛠️ Pengingat Servis Oli</div>
-        
-        <div style="background:var(--bg);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">
-          <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:4px">Jarak Sejak Ganti Oli Terakhir</div>
-          <div style="font-size:28px;font-weight:800;color:var(--primary)" id="currentOilKmDisplay">0 km</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px" id="oilBreakdownDisplay">GPS: 0 km · Manual: 0 km</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px" id="oilTargetInfo">Target: 2500 km</div>
+        <div style="font-size:15px;font-weight:800;margin-bottom:16px">🛠️ Pengingat Servis Oli</div>
+        <div style="background:var(--bg);border-radius:16px;padding:20px;margin-bottom:20px;text-align:center;border:1px solid var(--border)">
+          <div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Jarak Sejak Ganti Oli</div>
+          <div style="font-size:32px;font-weight:800;color:var(--primary)" id="currentOilKmDisplay">0 km</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:8px;font-weight:600" id="oilBreakdownDisplay">GPS: 0 km · Manual: 0 km</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;font-weight:600" id="oilTargetInfo">Target: 2500 km</div>
         </div>
-
         <div class="form-group">
-          <label class="form-label">Atur Target Ganti Oli (km)</label>
+          <label class="form-label">Target Ganti Oli (km)</label>
           <input type="number" class="form-input" id="setOilTargetKm" onchange="saveOilTarget()">
         </div>
-        <button class="btn btn-outline" style="width:100%;border-color:var(--green);color:var(--green)" onclick="resetOil()">🔄 Sudah Ganti Oli (Reset 0 km)</button>
+        <button class="btn btn-outline" style="width:100%;border-color:var(--green);color:var(--green)" onclick="resetOil()">🔄 Reset Oli (Sudah Ganti)</button>
       </div>
 
       <div class="card">
-        <div style="font-size:14px;font-weight:800;margin-bottom:16px">⚙️ Pengaturan Aplikasi</div>
+        <div style="font-size:15px;font-weight:800;margin-bottom:16px">⚙️ Pengaturan Aplikasi</div>
         <div class="form-group">
-          <label class="form-label">Target Pendapatan Harian (Rp)</label>
+          <label class="form-label">Target Harian (Rp)</label>
           <input type="number" class="form-input" id="setDailyTarget" onchange="saveSettings()">
         </div>
         <div class="form-group">
-          <label class="form-label">Target Pendapatan Mingguan (Rp)</label>
+          <label class="form-label">Target Mingguan (Rp)</label>
           <input type="number" class="form-input" id="setWeeklyTarget" onchange="saveSettings()">
         </div>
         <div class="form-group">
-          <label class="form-label">Target Pendapatan Bulanan (Rp)</label>
+          <label class="form-label">Target Bulanan (Rp)</label>
           <input type="number" class="form-input" id="setMonthlyTarget" onchange="saveSettings()">
         </div>
         
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
           <div>
             <div style="font-size:14px;font-weight:700">Mode Gelap</div>
-            <div style="font-size:11px;color:var(--muted)">Nyaman untuk ngojek malam</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Nyaman untuk ngojek malam</div>
           </div>
-          <input type="checkbox" id="setDarkMode" onchange="toggleDarkMode()" style="width:24px;height:24px;accent-color:var(--primary)">
+          <input type="checkbox" id="setDarkMode" onchange="toggleDarkMode()" style="width:28px;height:28px;accent-color:var(--primary)">
         </div>
       </div>
 
       <div class="card">
-        <div style="font-size:14px;font-weight:800;margin-bottom:16px">🔐 Keamanan & Data</div>
+        <div style="font-size:15px;font-weight:800;margin-bottom:16px">🔐 Keamanan & Data</div>
         <button class="btn btn-outline" style="width:100%;margin-bottom:12px" onclick="setPIN()">Aktifkan / Ubah PIN</button>
-        
         <div class="grid-2" style="margin-bottom:12px">
           <button class="btn btn-outline" style="border-color:var(--green);color:var(--green)" onclick="exportJSON()">📋 Copy Backup</button>
           <button class="btn btn-outline" style="border-color:var(--primary);color:var(--primary)" onclick="openRestoreModal()">📥 Restore Data</button>
         </div>
-        
         <div class="grid-2" style="margin-bottom:12px">
           <button class="btn btn-outline" onclick="window.print()">Cetak PDF</button>
           <button class="btn btn-outline" onclick="exportCSV()">Export CSV</button>
         </div>
-        
         <button class="btn btn-danger" style="width:100%" onclick="confirmReset()">Reset Semua Data</button>
-        <div class="hint" style="text-align:center;margin-top:16px">Driver Cuan v5.6 • Data 100% Offline</div>
+        <div class="hint" style="text-align:center;margin-top:20px">Driver Cuan v5.7 • Data 100% Offline</div>
       </div>
     </section>
 
@@ -449,25 +465,26 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
 
   <nav class="bottom-nav">
     <button class="nav-btn active" data-tab="home" onclick="switchTab('home')">
-      <span class="nav-icon">🏠</span><span>Beranda</span>
+      <span class="nav-icon-wrap"><span class="nav-icon">🏠</span></span><span>Beranda</span>
     </button>
     <button class="nav-btn" data-tab="journal" onclick="switchTab('journal')">
-      <span class="nav-icon">📅</span><span>Jurnal</span>
+      <span class="nav-icon-wrap"><span class="nav-icon">📅</span></span><span>Jurnal</span>
     </button>
     <button class="nav-btn" data-tab="track" onclick="switchTab('track')">
-      <span class="nav-icon">🗺️</span><span>Peta</span>
+      <span class="nav-icon-wrap"><span class="nav-icon">🗺️</span></span><span>Peta</span>
     </button>
     <button class="nav-btn" data-tab="savings" onclick="switchTab('savings')">
-      <span class="nav-icon">🎯</span><span>Tabungan</span>
+      <span class="nav-icon-wrap"><span class="nav-icon">🎯</span></span><span>Tabungan</span>
     </button>
     <button class="nav-btn" data-tab="settings" onclick="switchTab('settings')">
-      <span class="nav-icon">⚙️</span><span>Lainnya</span>
+      <span class="nav-icon-wrap"><span class="nav-icon">⚙️</span></span><span>Lainnya</span>
     </button>
   </nav>
 
   <button class="fab" onclick="openEntryModal('income')">+</button>
 </div>
 
+<!-- MODAL ENTRY -->
 <div id="entryModal" class="modal-overlay" onclick="if(event.target===this)closeEntryModal()">
   <div class="modal">
     <div class="modal-header">
@@ -490,7 +507,7 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
     <div class="form-group" id="manualKmGroup" style="display:none">
       <label class="form-label">Jarak Tempuh (km) - Opsional</label>
       <input type="number" class="form-input" id="entryManualKm" placeholder="Misal: 15.5" step="0.1">
-      <div class="hint">Isi ini jika tidak menyalakan GPS agar hitungan ganti oli tetap jalan.</div>
+      <div class="hint">Isi ini jika tidak menyalakan GPS agar hitungan oli tetap akurat.</div>
     </div>
 
     <div class="form-row">
@@ -509,10 +526,11 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
       <input type="text" class="form-input" id="entryNote" placeholder="Orderan ramai, dsb...">
     </div>
 
-    <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="saveEntry()">Simpan Transaksi</button>
+    <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="saveEntry()">Simpan Transaksi</button>
   </div>
 </div>
 
+<!-- MODAL BACKUP/RESTORE -->
 <div id="backupModal" class="modal-overlay" onclick="if(event.target===this)closeBackupModal()">
   <div class="modal">
     <div class="modal-header">
@@ -521,20 +539,21 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
     </div>
     
     <div id="backupTextArea" style="display:none">
-      <div class="hint" style="margin-bottom:12px;font-size:13px">Data di bawah ini sudah <b>otomatis tercopy ke Clipboard HP kamu</b>. Silakan buka WhatsApp/Notes, lalu Paste (Tempel) di sana untuk menyimpannya.</div>
-      <textarea id="backupOutput" class="form-input" style="height:150px;font-size:10px;font-family:monospace" readonly></textarea>
-      <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="closeBackupModal()">Tutup</button>
+      <div class="hint" style="margin-bottom:16px;font-size:13px;line-height:1.6">Data di bawah ini sudah <b>otomatis tercopy ke Clipboard HP kamu</b>. Silakan buka WhatsApp/Notes, lalu Paste (Tempel) di sana untuk menyimpannya.</div>
+      <textarea id="backupOutput" class="form-input" style="height:150px;font-size:11px;font-family:monospace;line-height:1.4;background:var(--bg);color:var(--muted)" readonly></textarea>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="closeBackupModal()">Tutup</button>
     </div>
 
     <div id="restoreTextArea" style="display:none">
-      <div class="hint" style="margin-bottom:12px;font-size:13px">Paste (Tempel) teks backup JSON kamu ke dalam kotak di bawah ini, lalu klik Restore.</div>
-      <textarea id="restoreInput" class="form-input" style="height:150px;font-size:10px;font-family:monospace" placeholder='{"entries": [...]}'></textarea>
-      <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="processRestoreText()">Proses Restore</button>
-      <button class="btn btn-outline" style="width:100%;margin-top:8px" onclick="document.getElementById('restoreFile').click()">Atau Pilih File JSON</button>
+      <div class="hint" style="margin-bottom:16px;font-size:13px;line-height:1.6">Paste (Tempel) teks backup JSON kamu ke dalam kotak di bawah ini, lalu klik Restore.</div>
+      <textarea id="restoreInput" class="form-input" style="height:150px;font-size:11px;font-family:monospace;line-height:1.4" placeholder='{"entries": [...]}'></textarea>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="processRestoreText()">Proses Restore</button>
+      <button class="btn btn-outline" style="width:100%;margin-top:12px" onclick="document.getElementById('restoreFile').click()">Atau Pilih File JSON</button>
     </div>
   </div>
 </div>
 
+<!-- MODAL GOAL -->
 <div id="goalModal" class="modal-overlay" onclick="if(event.target===this)closeGoalModal()">
   <div class="modal">
     <div class="modal-header">
@@ -549,10 +568,11 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
       <label class="form-label">Target Dana (Rp)</label>
       <input type="number" class="form-input" id="goalTarget" placeholder="1000000">
     </div>
-    <button class="btn btn-primary" style="width:100%" onclick="saveGoal()">Buat Target</button>
+    <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="saveGoal()">Buat Target</button>
   </div>
 </div>
 
+<!-- MODAL DEBT -->
 <div id="debtModal" class="modal-overlay" onclick="if(event.target===this)closeDebtModal()">
   <div class="modal">
     <div class="modal-header">
@@ -571,7 +591,7 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
       <label class="form-label">Nominal (Rp)</label>
       <input type="number" class="form-input" id="debtAmount" placeholder="50000">
     </div>
-    <button class="btn btn-primary" style="width:100%" onclick="saveDebt()">Simpan Catatan</button>
+    <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="saveDebt()">Simpan Catatan</button>
   </div>
 </div>
 
@@ -581,7 +601,7 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
 <script>
 'use strict';
 
-const STORAGE_KEY = 'driver_cuan_v5'; // Storage key dibedakan agar tidak bentrok dengan aplikasi lama
+const STORAGE_KEY = 'driver_cuan_v5'; 
 const CATS = {
   income: [
     { id: 'Trip', icon: '🛵', label: 'Trip' },
@@ -1018,28 +1038,43 @@ function renderJournal(){
     const entries = getDayEntries(key);
     const inc = sumBy(entries, 'income'), exp = sumBy(entries, 'expense');
     const net = inc - exp;
-    return `<div class="card" style="padding:16px;margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:8px">
+    const id = 'day-' + key.replace(/-/g,'');
+    return `<div class="journal-card">
+      <div class="journal-header" onclick="toggleJournal('${id}')">
         <div>
-          <div style="font-size:14px;font-weight:800">${formatDateKey(key)}</div>
-          <div style="font-size:11px;color:var(--muted);font-weight:500">${entries.length} transaksi</div>
+          <div class="journal-date"><span class="journal-date-icon"></span> ${formatDateKey(key)}</div>
+          <div class="journal-sub">${entries.length} transaksi · +${rpShort(inc)} · -${rpShort(exp)}</div>
         </div>
-        <div style="font-size:16px;font-weight:800;color:var(--${net>=0?'green':'red'})">${rpShort(net)}</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="journal-net ${net>=0?'pos':'neg'}">${rpShort(net)}</div>
+          <div style="font-size:18px;color:var(--muted);transform:rotate(90deg)" id="arrow-${id}">›</div>
+        </div>
       </div>
-      ${entries.sort((a,b)=>b.ts-a.ts).map(e => {
-        const cat = CAT_MAP[e.category] || {icon:'📦', label:e.category};
-        const isInc = e.type === 'income';
-        return `<div class="list-item" onclick="editEntry('${e.id}')" style="padding:10px 0">
-          <div class="li-icon ${isInc?'':'exp'}" style="width:36px;height:36px;font-size:16px">${cat.icon}</div>
-          <div class="li-body">
-            <div class="li-title">${cat.label} ${e.note ? '· '+escapeHtml(e.note) : ''}</div>
-            <div class="li-sub">${formatTime(e.ts)} ${e.manualKm ? '· '+e.manualKm+' km' : ''}</div>
-          </div>
-          <div class="li-amount" style="color:var(--${isInc?'green':'red'})">${isInc?'+':'-'}${rp(e.amount).replace('Rp ','')}</div>
-        </div>`;
-      }).join('')}
+      <div class="journal-details" id="${id}">
+        ${entries.sort((a,b)=>b.ts-a.ts).map(e => {
+          const cat = CAT_MAP[e.category] || {icon:'📦', label:e.category};
+          const isInc = e.type === 'income';
+          return `<div class="list-item" onclick="editEntry('${e.id}')" style="padding:14px 0">
+            <div class="li-icon ${isInc?'':'exp'}" style="width:40px;height:40px;font-size:18px">${cat.icon}</div>
+            <div class="li-body">
+              <div class="li-title">${cat.label} ${e.note ? '· '+escapeHtml(e.note) : ''}</div>
+              <div class="li-sub">${formatTime(e.ts)} ${e.manualKm ? '· '+e.manualKm+' km' : ''}</div>
+            </div>
+            <div class="li-amount" style="color:var(--${isInc?'green':'red'})">${isInc?'+':'-'}${rp(e.amount).replace('Rp ','')}</div>
+          </div>`;
+        }).join('')}
+      </div>
     </div>`;
   }).join('') : '<div class="empty"><div class="empty-icon">📅</div>Belum ada riwayat</div>';
+}
+
+function toggleJournal(id) {
+  const el = $(id);
+  const arrow = $('arrow-' + id);
+  if (el) {
+    el.classList.toggle('open');
+    if(arrow) arrow.style.transform = el.classList.contains('open') ? 'rotate(-90deg)' : 'rotate(90deg)';
+  }
 }
 
 function renderSavings(){
@@ -1054,7 +1089,7 @@ function renderSavings(){
         <div class="goal-pct">${Math.round(pct)}%</div>
       </div>
       <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
-      <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;font-weight:600">
+      <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:13px;font-weight:600">
         <span style="color:var(--green)">Terkumpul: ${rp(g.saved)}</span>
         <span style="color:var(--muted)">Sisa: ${rp(g.target - g.saved)}</span>
       </div>
@@ -1067,7 +1102,7 @@ function renderSavings(){
 
   $('debtsList').innerHTML = state.debts.length ? state.debts.map(d => {
     const isUtang = d.type === 'utang';
-    return `<div class="list-item" style="background:var(--card);border-radius:16px;padding:16px;margin-bottom:8px;border:1px solid var(--border)">
+    return `<div class="list-item" style="background:var(--card);border-radius:20px;padding:16px;margin-bottom:10px;border:1px solid var(--border);box-shadow:var(--shadow)">
       <div class="li-icon" style="background:var(--${isUtang?'red':'green'}-light);color:var(--${isUtang?'red':'green'})">
         ${isUtang ? '📤' : '📥'}
       </div>
@@ -1077,7 +1112,7 @@ function renderSavings(){
       </div>
       <div style="text-align:right">
         <div class="li-amount" style="color:var(--${isUtang?'red':'green'})">${rp(d.amount)}</div>
-        <button class="btn btn-sm btn-outline" style="padding:4px 8px;font-size:10px;margin-top:6px" onclick="toggleDebtPaid('${d.id}')">
+        <button class="btn btn-sm btn-outline" style="padding:6px 10px;font-size:10px;margin-top:8px" onclick="toggleDebtPaid('${d.id}')">
           ${d.paid ? 'Lunas ✅' : 'Tandai Lunas'}
         </button>
       </div>
@@ -1431,14 +1466,14 @@ function renderTrack(){
   const active = getActiveTrack(), btn = $('btnTrackToggle'), label = $('trackLabel'), state_ = getTrackBtnState();
 
   if (active) {
-    label.innerHTML = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--green);margin-right:6px"></span>Tracking Aktif';
+    label.innerHTML = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--green);margin-right:8px"></span>Tracking Aktif';
     btn.textContent = state_ === 'stop' ? 'Hentikan' : 'Lanjutkan';
     btn.className = 'btn ' + (state_ === 'stop' ? 'btn-danger' : 'btn-primary');
     const dur = Math.round((Date.now() - active.startTs) / 60000);
     $('trackDistance').textContent = active.distance.toFixed(2) + ' km';
     $('trackDuration').textContent = dur < 60 ? dur + ' mnt' : (dur/60).toFixed(1) + ' jam';
   } else {
-    label.innerHTML = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--muted);margin-right:6px"></span>Tidak aktif';
+    label.innerHTML = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--muted);margin-right:8px"></span>Tidak aktif';
     btn.textContent = 'Mulai'; btn.className = 'btn btn-primary';
     $('trackDistance').textContent = '0.00 km'; $('trackDuration').textContent = '-';
   }
@@ -1448,11 +1483,11 @@ function renderTrack(){
     const d = new Date(t.startTs), isAct = !t.endTs && t.id === state.activeTrackId;
     const dur = t.endTs ? Math.round((t.endTs - t.startTs)/60000) : Math.round((Date.now() - t.startTs)/60000);
     const hasPoints = t.points && t.points.length > 0;
-    return `<div class="card" style="padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:12px;border-color:var(--${isAct?'green':'border'})" onclick="${hasPoints ? `selectTrack('${t.id}')` : ''}">
-      <div style="font-size:20px">${isAct?'🟢':(hasPoints?'📍':'🗑️')}</div>
+    return `<div class="card" style="padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:16px;border-color:var(--${isAct?'green':'border'});box-shadow:var(--shadow)" onclick="${hasPoints ? `selectTrack('${t.id}')` : ''}">
+      <div style="font-size:24px">${isAct?'🟢':(hasPoints?'📍':'🗑️')}</div>
       <div style="flex:1">
-        <div style="font-size:13px;font-weight:700">${d.getDate()}/${d.getMonth()+1} · ${formatTime(t.startTs)}</div>
-        <div style="font-size:11px;color:var(--muted)">${dur} mnt · ${t.distance.toFixed(1)} km ${hasPoints?'':'· Peta Dihapus'}</div>
+        <div style="font-size:14px;font-weight:800">${d.getDate()}/${d.getMonth()+1} · ${formatTime(t.startTs)}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;font-weight:500">${dur} mnt · ${t.distance.toFixed(1)} km ${hasPoints?'':'· Peta Dihapus'}</div>
       </div>
       <div style="color:var(--muted)">${hasPoints ? '›' : ''}</div>
     </div>`;
@@ -1485,7 +1520,7 @@ function renderTimeline(){
   list.innerHTML = recentTimeline.map(item => {
     const d = new Date(item.ts), dateStr = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} · ${formatTime(item.ts)}`;
     const isGps = item.type === 'gps';
-    return `<div class="list-item" style="padding:12px 0">
+    return `<div class="list-item" style="padding:14px 0">
       <div class="li-icon" style="background:var(--${isGps ? 'primary-light' : 'blue-light'}); color:var(--${isGps ? 'primary' : 'blue'})">${isGps ? '🛰️' : '⌨️'}</div>
       <div class="li-body">
         <div class="li-title">${isGps ? 'GPS Tracking' : 'Input Manual ('+ (item.note || 'Trip') +')'}</div>
