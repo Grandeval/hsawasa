@@ -446,7 +446,7 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
           <button class="btn btn-outline" onclick="exportCSV()">Export CSV</button>
         </div>
         <button class="btn btn-danger" style="width:100%" onclick="confirmReset()">Reset Semua Data</button>
-        <div class="hint" style="text-align:center;margin-top:20px">Driver Cuan v5.8 • Data 100% Offline</div>
+        <div class="hint" style="text-align:center;margin-top:20px">Driver Cuan v6.3 • Data 100% Offline</div>
       </div>
     </section>
 
@@ -596,7 +596,7 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
 <script>
 'use strict';
 
-const STORAGE_KEY = 'driver_cuan_v6'; // Versi baru, storage key dibedakan
+const STORAGE_KEY = 'driver_cuan_v6'; 
 const CATS = {
   income: [
     { id: 'Trip', icon: '🛵', label: 'Trip' },
@@ -805,30 +805,30 @@ function openDatePicker(){
 function getDayEntries(key){ return state.entries.filter(e => e.date === key); }
 function sumBy(arr, type){ return arr.filter(e => e.type === type).reduce((s,e) => s + e.amount, 0); }
 
-// AUDIT FIX: Filter berbasis string tanggal (YYYY-MM-DD) agar 100% akurat
-function getFilteredEntries(period) {
-  const now = new Date();
-  let startDateStr = '';
-  let endDateStr = dateKey(now);
+// === FUNGSI FILTER (AUDIT FIX: Murni String Comparison) ===
+function getFilteredEntries(period, baseDateStr) {
+  baseDateStr = baseDateStr || todayKey();
+  const [y, m, d] = baseDateStr.split('-').map(Number);
+  
+  let startStr = '';
+  let endStr = baseDateStr;
 
   if (period === 'today') {
-    startDateStr = todayKey();
+    startStr = baseDateStr;
   } else if (period === 'week') {
-    const start = new Date();
-    start.setDate(now.getDate() - 6);
-    startDateStr = dateKey(start);
+    const start = new Date(y, m - 1, d - 6);
+    startStr = dateKey(start.getTime());
   } else if (period === 'month') {
-    startDateStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-01';
+    startStr = `${y}-${String(m).padStart(2, '0')}-01`;
   } else {
-    return state.entries; // all
+    return state.entries;
   }
 
-  return state.entries.filter(e => e.date >= startDateStr && e.date <= endDateStr);
+  return state.entries.filter(e => e.date >= startStr && e.date <= endStr);
 }
 
-// Fungsi untuk menghitung ringkasan (Kotor, Pengeluaran, Bersih)
-function getSummary(period) {
-  const entries = getFilteredEntries(period);
+function getSummary(period, baseDateStr) {
+  const entries = getFilteredEntries(period, baseDateStr);
   const gross = sumBy(entries, 'income');
   const expense = sumBy(entries, 'expense');
   const net = gross - expense;
@@ -838,7 +838,7 @@ function getSummary(period) {
 function renderRecap() {
   document.querySelectorAll('#recapTabs button').forEach(b => b.classList.toggle('active', b.dataset.type === state.recapPeriod));
   
-  const summary = getSummary(state.recapPeriod);
+  const summary = getSummary(state.recapPeriod, todayKey());
   $('recapIncome').textContent = rp(summary.gross);
   $('recapExpense').textContent = rp(summary.expense);
   $('recapNet').textContent = rp(summary.net);
@@ -923,12 +923,12 @@ function renderHome(){
   circle.style.strokeDashoffset = 440 - (440 * pct / 100);
   circle.className = 'circle-fill ' + (pct >= 100 ? 'done' : '');
 
-  // AUDIT FIX: Rekap Minggu & Bulan pakai logika getSummary terbaru
-  const weekSummary = getSummary('week');
+  // === REKAP MINGGU & BULAN (FIXED 100%) ===
+  const weekSummary = getSummary('week', todayKey());
   $('homeWeekGross').textContent = rp(weekSummary.gross);
   $('homeWeekNet').textContent = rp(weekSummary.net);
 
-  const monthSummary = getSummary('month');
+  const monthSummary = getSummary('month', todayKey());
   $('homeMonthGross').textContent = rp(monthSummary.gross);
   $('homeMonthNet').textContent = rp(monthSummary.net);
   $('headerMonthNet').textContent = rp(monthSummary.net);
@@ -1001,24 +1001,27 @@ function selectCategory(id){ state.selectedCategory = id; updateTypeUI(); }
 function editEntry(id){ const e = state.entries.find(x => x.id === id); if(e) openEntryModal(e.type, id); }
 
 function saveEntry(){
-  const date = $('entryDate').value;
+  // === PAKSA FORMAT TANGGAL MENJADI YYYY-MM-DD ===
+  const dateRaw = $('entryDate').value;
   const time = $('entryTime').value || '12:00';
   const amount = Number($('entryAmount').value);
   const category = state.selectedCategory;
   const note = $('entryNote').value.trim();
   const manualKm = Number($('entryManualKm').value) || 0;
 
-  if (!date || amount <= 0) return toast('Isi nominal dengan benar', 'error');
+  if (!dateRaw || amount <= 0) return toast('Isi tanggal & nominal dengan benar', 'error');
 
-  const [h, m] = time.split(':').map(Number);
-  const dt = new Date(date + 'T00:00:00'); dt.setHours(h, m, 0, 0);
+  const [y, m, d] = dateRaw.split('-').map(Number);
+  const properDate = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  const [h, min] = time.split(':').map(Number);
+  const dt = new Date(y, m - 1, d, h, min, 0, 0);
   
   if (state.editingEntryId) {
     const e = state.entries.find(x => x.id === state.editingEntryId);
-    Object.assign(e, { date, ts: dt.getTime(), amount, category, note, type: state.newEntryType, manualKm });
+    Object.assign(e, { date: properDate, ts: dt.getTime(), amount, category, note, type: state.newEntryType, manualKm });
     toast('Diperbarui', 'success');
   } else {
-    state.entries.push({ id: uid(), type: state.newEntryType, date, ts: dt.getTime(), amount, category, note, manualKm });
+    state.entries.push({ id: uid(), type: state.newEntryType, date: properDate, ts: dt.getTime(), amount, category, note, manualKm });
     toast('Tersimpan 💾', 'success');
   }
   persist(); closeEntryModal(); renderHome(); renderJournal(); updateOilUI();
@@ -1185,7 +1188,7 @@ function setPIN(){
 function renderSettings(){ updateOilUI(); renderCharts(); }
 
 function renderCharts(){
-  const entriesToUse = getFilteredEntries(state.recapPeriod);
+  const entriesToUse = getFilteredEntries(state.recapPeriod, todayKey());
   
   const expData = {};
   const hourData = { 'Pagi (6-11)':0, 'Siang (12-15)':0, 'Sore (16-18)':0, 'Malam (19-23)':0, 'Subuh (0-5)':0 };
