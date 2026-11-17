@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Dompet Driver</title>
+<title>Driver Cuan</title>
 
 <script>
   window.IS_NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
@@ -210,7 +210,7 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
   <header class="app-header">
     <div class="header-row">
       <div>
-        <div class="app-title"><span>🛵</span> Dompet<span>Driver</span></div>
+        <div class="app-title"><span>🛵</span> Driver<span>Cuan</span></div>
         <div class="header-sub" id="headerSub">Pembukuan Harian</div>
       </div>
       <div class="header-net">
@@ -273,7 +273,6 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
         </div>
       </div>
 
-      <!-- RECAP MINGGUAN & BULANAN DI BERANDA -->
       <div class="grid-2" style="margin-top:-4px">
         <div class="stat-box" style="padding:12px">
           <div class="stat-label" style="font-size:10px">📅 Minggu Ini</div>
@@ -349,7 +348,6 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
     <section id="screen-settings" class="screen">
       <h2 style="margin:0 0 16px;font-size:20px;font-weight:800">Lainnya</h2>
       
-      <!-- REKAP KEUANGAN (BARU) -->
       <div class="card">
         <div style="font-size:14px;font-weight:800;margin-bottom:12px">📅 Rekap Keuangan</div>
         
@@ -375,7 +373,6 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
         </div>
       </div>
 
-      <!-- Statistik (Otomatis ikut Rekap) -->
       <div class="card">
         <div style="font-size:14px;font-weight:800;margin-bottom:16px">📊 Grafik & Analitik</div>
         <div class="chart-container"><canvas id="chartExpense"></canvas></div>
@@ -438,7 +435,7 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
         </div>
         
         <button class="btn btn-danger" style="width:100%" onclick="confirmReset()">Reset Semua Data</button>
-        <div class="hint" style="text-align:center;margin-top:16px">Dompet Driver v5.6 • Data 100% Offline</div>
+        <div class="hint" style="text-align:center;margin-top:16px">Driver Cuan v5.6 • Data 100% Offline</div>
       </div>
     </section>
 
@@ -584,7 +581,7 @@ body.light-mode .cat-btn.active{color:var(--primary-dark)}
 <script>
 'use strict';
 
-const STORAGE_KEY = 'dompet_driver_v5';
+const STORAGE_KEY = 'driver_cuan_v5'; // Storage key dibedakan agar tidak bentrok dengan aplikasi lama
 const CATS = {
   income: [
     { id: 'Trip', icon: '🛵', label: 'Trip' },
@@ -793,7 +790,6 @@ function openDatePicker(){
 function getDayEntries(key){ return state.entries.filter(e => e.date === key); }
 function sumBy(arr, type){ return arr.filter(e => e.type === type).reduce((s,e) => s + e.amount, 0); }
 
-// === FUNGSI REKAP PERIODE ===
 function getFilteredEntries(period) {
   const now = new Date();
   let startTs = 0;
@@ -827,7 +823,6 @@ function changeRecapPeriod(period) {
   renderCharts();
 }
 
-// === FUNGSI OLI ===
 function getOilKmData() {
   const resetTs = state.settings.oilLastResetTs || 0;
   let gpsKm = 0, manualKm = 0;
@@ -893,7 +888,6 @@ function renderHome(){
   $('dayNet').textContent = rp(net);
   $('dayNet').style.color = net >= 0 ? 'var(--green)' : 'var(--red)';
 
-  // Target Harian
   const target = state.settings.daily;
   const pct = target > 0 ? Math.min((income / target) * 100, 100) : 0;
   $('targetPct').textContent = Math.round(pct) + '%';
@@ -901,7 +895,6 @@ function renderHome(){
   circle.style.strokeDashoffset = 440 - (440 * pct / 100);
   circle.className = 'circle-fill ' + (pct >= 100 ? 'done' : '');
 
-  // Rekap Minggu & Bulan di Beranda
   const weekStart = new Date(Date.now() - 6*86400000).setHours(0,0,0,0);
   const weekEntries = state.entries.filter(e => e.ts >= weekStart);
   const weekNet = sumBy(weekEntries, 'income') - sumBy(weekEntries, 'expense');
@@ -1014,7 +1007,7 @@ function saveEntry(){
   }
   persist(); closeEntryModal(); renderHome(); renderJournal(); updateOilUI();
   if (state.currentTab === 'track') renderTimeline();
-  renderRecap(); // Update rekap
+  renderRecap(); 
 }
 
 function renderJournal(){
@@ -1159,7 +1152,7 @@ function setPIN(){
 function renderSettings(){ updateOilUI(); renderCharts(); }
 
 function renderCharts(){
-  const entriesToUse = getFilteredEntries(state.recapPeriod); // Gunakan data sesuai periode rekap
+  const entriesToUse = getFilteredEntries(state.recapPeriod);
   
   const expData = {};
   const hourData = { 'Pagi (6-11)':0, 'Siang (12-15)':0, 'Sore (16-18)':0, 'Malam (19-23)':0, 'Subuh (0-5)':0 };
@@ -1211,7 +1204,7 @@ function checkDailyReminder() {
     const now = new Date(), hours = now.getHours(), mins = now.getMinutes(), today = todayKey();
     if (hours === 21 && mins === 0) {
       if (getDayEntries(today).length === 0) {
-        if (Notification.permission === 'granted') new Notification('Dompet Driver', { body: 'Kamu belum mencatat pendapatan hari ini. Yuk isi sekarang!' });
+        if (Notification.permission === 'granted') new Notification('Driver Cuan', { body: 'Kamu belum mencatat pendapatan hari ini. Yuk isi sekarang!' });
       }
     }
   }, 60000);
@@ -1308,7 +1301,7 @@ function exportCSV(){
     csv += `${e.date},${formatTime(e.ts)},${e.type},"${e.category}",${e.type==='income'?e.amount:-e.amount},${e.manualKm||0},"${e.note||''}"\n`;
   });
   const blob = new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'dompet-driver.csv'; a.click();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'driver-cuan.csv'; a.click();
   toast('CSV diunduh', 'success');
 }
 
@@ -1348,7 +1341,7 @@ async function startNativeWatcher(){
   const bg = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.BackgroundGeolocation;
   if (!bg) return false;
   try {
-    nativeWatcherId = await bg.addWatcher({ backgroundMessage: 'Merekam perjalanan...', backgroundTitle: 'Dompet Driver', requestPermissions: true, stale: false, distanceFilter: 20 },
+    nativeWatcherId = await bg.addWatcher({ backgroundMessage: 'Merekam perjalanan...', backgroundTitle: 'Driver Cuan', requestPermissions: true, stale: false, distanceFilter: 20 },
       (loc, err) => { if(loc) onTrackPos({ coords: { latitude: loc.latitude, longitude: loc.longitude, accuracy: loc.accuracy } }); });
     return true;
   } catch(e){ return false; }
