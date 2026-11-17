@@ -1,6 +1,6 @@
 {
-  "appId": "com.ojolku.app",
-  "appName": "OjolKu",
+  "appId": "com.drivercuan.app",
+  "appName": "Driver Cuan",
   "webDir": "www",
   "server": {
     "androidScheme": "https"
